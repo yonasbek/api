@@ -20,7 +20,7 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: 'Login user' })
   @ApiResponse({ status: 200, description: 'User successfully logged in' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
