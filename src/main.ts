@@ -13,8 +13,6 @@ async function bootstrap() {
   // Enable CORS
   app.enableCors({
     origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    // credentials: true,
   });
   // Enable validation pipes
   app.useGlobalPipes(new ValidationPipe());
