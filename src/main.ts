@@ -10,10 +10,17 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/',
   });
-  // Enable CORS
+  
+  // Enable CORS with more detailed configuration
   app.enableCors({
-    origin: '*',
+    origin: true, // Allow all origins
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+    exposedHeaders: 'Content-Range, X-Content-Range',
+    maxAge: 3600,
   });
+
   // Enable validation pipes
   app.useGlobalPipes(new ValidationPipe());
 
