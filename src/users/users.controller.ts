@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Delete, Put } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -38,5 +38,22 @@ export class UsersController {
       where: { id },
       relations: ['role'],
     });
+  }
+
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateData: Partial<User>,
+  ): Promise<User | null> {
+    await this.usersRepository.update(id, updateData);
+    return this.usersRepository.findOne({
+      where: { id },
+      relations: ['role', 'department'],
+    });
+  }
+
+  @Delete(':id')
+  async softDelete(@Param('id') id: string): Promise<void> {
+    await this.usersRepository.update(id, { isActive: false });
   }
 } 

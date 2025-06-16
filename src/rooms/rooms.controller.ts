@@ -96,4 +96,11 @@ export class RoomsController {
   removeBooking(@Param('id') id: string) {
     return this.roomsService.deleteBooking(id);
   }
+
+  @Get('bookings/room/:id')
+  @ApiOperation({ summary: 'Get bookings by room id' })
+  @ApiResponse({ status: 200, description: 'Return bookings by room id' })
+  getBookingsByRoomId(@Param('id') id: string) {
+    return this.roomsService.getBookingsByRoomId(id);
+  }
 } 

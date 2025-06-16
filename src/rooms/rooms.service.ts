@@ -178,4 +178,10 @@ export class RoomsService {
 
     return rooms;
   }
+
+  async getBookingsByRoomId(roomId: string): Promise<Booking[]> {
+    return await this.bookingRepository.find({
+      where: { room_id: roomId },
+    });
+  }
 } 

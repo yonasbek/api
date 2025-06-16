@@ -19,13 +19,6 @@ export class Booking extends BaseEntity {
   @Column()
   room_id: string;
 
-  @ApiProperty({ example: 'user-123' })
-  @Column()
-  user_id: string;
-
-  @ApiProperty({ example: 'John Doe' })
-  @Column()
-  user_name: string;
 
   @ApiProperty({ example: 'Team Planning Meeting' })
   @Column()
