@@ -11,8 +11,16 @@ async function bootstrap() {
     prefix: '/uploads/',
   });
   
-  // Enable CORS with more detailed configuration
-  app.enableCors();
+  // Enable CORS with explicit configuration
+  app.enableCors({
+    origin: '*',
+    methods: '*',
+    allowedHeaders: '*',
+    exposedHeaders: '*',
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+  });
 
   // Enable validation pipes
   app.useGlobalPipes(new ValidationPipe());

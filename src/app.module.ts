@@ -15,6 +15,7 @@ import { DocumentsModule } from './documents/documents.module';
 import { typeOrmConfig } from './config/typeorm.config';
 import { PlansModule } from './plans/plans.module';
 import { UploadModule } from './upload/upload.module';
+import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -33,6 +34,7 @@ import { UploadModule } from './upload/upload.module';
     DocumentsModule,
     PlansModule,
     UploadModule,
+    UsersModule,
   ],
 })
 export class AppModule {} 
