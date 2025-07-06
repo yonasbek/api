@@ -19,12 +19,10 @@ export class AttendanceController {
   @ApiOperation({ summary: 'Check in for the day' })
   @ApiResponse({ status: 201, description: 'Check-in recorded successfully' })
   async checkIn(
-    @GetUser() user: User,
     @Body() checkInData: CreateAttendanceDto
   ) {
     return await this.attendanceService.create({
       ...checkInData,
-      user_id: user.id,
       status: AttendanceStatus.PRESENT
     });
   }
@@ -82,12 +80,10 @@ export class AttendanceController {
   @ApiOperation({ summary: 'Request leave' })
   @ApiResponse({ status: 201, description: 'Leave request submitted successfully' })
   async requestLeave(
-    @GetUser() user: User,
     @Body() leaveData: CreateAttendanceDto
   ) {
     return await this.attendanceService.create({
       ...leaveData,
-      user_id: user.id,
       status: AttendanceStatus.LEAVE
     });
   }

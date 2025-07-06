@@ -84,8 +84,12 @@ export class AttendanceService {
     Object.assign(attendance, updateAttendanceDto);
 
     // Calculate work hours if both check-in and check-out exist
-    if (attendance.check_in && attendance.check_out) {
-      const hours = (attendance.check_out.timestamp.getTime() - attendance.check_in.timestamp.getTime()) / (1000 * 60 * 60);
+    if (attendance.check_in && attendance.check_out && attendance.check_out.timestamp) {
+      // Ensure timestamps are Date objects before calculation
+      const checkInTime = new Date(attendance.check_in.timestamp);
+      const checkOutTime = new Date(attendance.check_out.timestamp);
+      
+      const hours = (checkOutTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60);
       attendance.work_hours = Number(hours.toFixed(2));
     }
 
