@@ -50,11 +50,11 @@ export class CreateAttendanceDto {
   @IsNotEmpty()
   status: AttendanceStatus;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @ValidateNested()
   @Type(() => CheckInOutDto)
-  @IsNotEmpty()
-  check_in: CheckInOutDto;
+  @IsOptional()
+  check_in?: CheckInOutDto;
 
   @ApiProperty({ required: false })
   @ValidateNested()
