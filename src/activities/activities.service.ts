@@ -53,7 +53,7 @@ export class ActivitiesService {
 
   async findAll(): Promise<Activity[]> {
     return await this.activityRepository.find({
-      relations: ['plan', 'comments', 'attachments', 'reminders'],
+      relations: ['plan', 'comments', 'attachments', 'reminders', 'subactivities'],
       order: {
         start_date: 'ASC',
       },
@@ -63,7 +63,7 @@ export class ActivitiesService {
   async findOne(id: string): Promise<Activity> {
     const activity = await this.activityRepository.findOne({
       where: { id },
-      relations: ['plan', 'comments', 'attachments', 'reminders'],
+      relations: ['plan', 'comments', 'attachments', 'reminders', 'subactivities'],
     });
 
     if (!activity) {
@@ -122,7 +122,7 @@ export class ActivitiesService {
   async findByPlanId(planId: string): Promise<Activity[]> {
     return await this.activityRepository.find({
       where: { plan_id: planId },
-      relations: ['comments', 'attachments', 'reminders'],
+      relations: ['comments', 'attachments', 'reminders', 'subactivities'],
       order: {
         start_date: 'ASC',
       },

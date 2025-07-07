@@ -1,46 +1,62 @@
 import { Entity, Column } from 'typeorm';
 import { BaseEntity } from '../../common/entities/base.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { ContactType, ContactPosition } from '../enums/contact-type.enum';
 
 @Entity('contacts')
 export class Contact extends BaseEntity {
-  @ApiProperty({ example: 'Yonas Bekele' })
+  @ApiProperty({ example: 'Federal Ministry of Health' })
   @Column()
-  fullName: string;
+  instituteName: string;
 
-  @ApiProperty({ example: 'Software developer' })
+  @ApiProperty({ example: 'Dr. Yonas Bekele' })
   @Column()
-  jobTitle: string;
+  individualName: string;
 
-  @ApiProperty({ example: 'external' })
+  @ApiProperty({ enum: ContactPosition, example: ContactPosition.HEAD })
+  @Column({
+    type: 'enum',
+    enum: ContactPosition,
+    default: ContactPosition.OTHER
+  })
+  position: ContactPosition;
+
+  @ApiProperty({ example: '+251911234567' })
   @Column()
-  department: string;
+  phoneNumber: string;
 
-  @ApiProperty({ example: '+251923273069' })
-  @Column()
-  officePhone: string;
-
-  @ApiProperty({ example: '+251923273069', required: false })
-  @Column({ nullable: true })
-  mobileNumber?: string;
-
-  @ApiProperty({ example: 'yonasbek4@gmail.com' })
+  @ApiProperty({ example: 'yonas.bekele@moh.gov.et' })
   @Column()
   emailAddress: string;
 
-  @ApiProperty({ example: 'Addis Ababa, ETH', required: false })
+  @ApiProperty({ enum: ContactType, example: ContactType.MOH_AGENCIES })
+  @Column({
+    type: 'enum',
+    enum: ContactType
+  })
+  organizationType: ContactType;
+
+  @ApiProperty({ example: 'Addis Ababa', required: false })
+  @Column({ nullable: true })
+  region?: string;
+
+  @ApiProperty({ example: 'Main office building, 3rd floor', required: false })
   @Column({ nullable: true })
   location?: string;
 
-  @ApiProperty({ example: '2025-05-29T07:47', required: false })
+  @ApiProperty({ example: 'Mon-Fri 8:00-17:00', required: false })
   @Column({ nullable: true })
-  availableHour?: string;
+  availableHours?: string;
 
-  @ApiProperty({ example: 'desc', required: false })
+  @ApiProperty({ example: true })
+  @Column({ default: true })
+  isActive: boolean;
+
+  @ApiProperty({ example: 'Additional notes about the contact', required: false })
+  @Column({ type: 'text', nullable: true })
+  notes?: string;
+
+  @ApiProperty({ example: '+251922345678', required: false })
   @Column({ nullable: true })
-  availableHourDesc?: string;
-
-  @ApiProperty({ example: 'partner' })
-  @Column()
-  category: string;
+  alternativePhone?: string;
 }

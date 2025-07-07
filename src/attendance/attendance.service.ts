@@ -18,8 +18,8 @@ export class AttendanceService {
       where: {
         user_id: createAttendanceDto.user_id,
         date: Between(
-          new Date(new Date(createAttendanceDto.check_in.timestamp).setHours(0,0,0,0)),
-          new Date(new Date(createAttendanceDto.check_in.timestamp).setHours(23,59,59,999))
+          new Date(new Date(createAttendanceDto?.check_in?.timestamp || new Date().toISOString()).setHours(0,0,0,0)),
+          new Date(new Date(createAttendanceDto?.check_in?.timestamp || new Date().toISOString()).setHours(23,59,59,999))
         ),
       },
     });
@@ -30,7 +30,7 @@ export class AttendanceService {
 
     const attendance = this.attendanceRepository.create({
       ...createAttendanceDto,
-      date: new Date(createAttendanceDto.check_in.timestamp),
+      date: new Date(createAttendanceDto?.check_in?.timestamp || new Date().toISOString()),
       work_hours: 0,
       is_late: false,
     });

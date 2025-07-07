@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } f
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto, CheckInOutDto } from './dto/create-attendance.dto';
-import { CreateLeaveDto } from './dto/create-leave.dto';
+// import { CreateLeaveDto } from './dto/create-leave.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from '../users/entities/user.entity';
@@ -77,14 +77,14 @@ export class AttendanceController {
     return await this.attendanceService.getMonthlyReport(year, month, userId);
   }
 
-  @Post('leave')
-  @ApiOperation({ summary: 'Request leave' })
-  @ApiResponse({ status: 201, description: 'Leave request submitted successfully' })
-  async requestLeave(
-    @Body() leaveData: CreateLeaveDto
-  ) {
-    return await this.attendanceService.requestLeave(leaveData);
-  }
+  // @Post('leave')
+  // @ApiOperation({ summary: 'Request leave' })
+  // @ApiResponse({ status: 201, description: 'Leave request submitted successfully' })
+  // async requestLeave(
+  //   @Body() leaveData: CreateLeaveDto
+  // ) {
+  //   return await this.attendanceService.requestLeave(leaveData);
+  // }
 
   @Post(':id/approve-leave')
   @ApiOperation({ summary: 'Approve leave request' })

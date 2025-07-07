@@ -7,7 +7,8 @@ export enum PlanType {
   PFRD = 'PFRD',
   ECCD = 'ECCD',
   HDD = 'HDD',
-  SRD = 'SRD'
+  SRD = 'SRD',
+  LEO = 'LEO'
 }
 
 @Entity('plans')

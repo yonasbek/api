@@ -2,6 +2,7 @@ import { Entity, Column, OneToMany, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../../common/entities/base.entity';
 import { ActivityComment } from './activity-comment.entity';
 import { ActivityAttachment } from './activity-attachment.entity';
+import { SubActivity } from './subactivity.entity';
 import { Plan } from '../../plans/entities/plan.entity';
 import { Reminder } from '../../reminders/entities/reminder.entity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -10,7 +11,8 @@ export enum PlanType {
   PFRD = 'PFRD',
   ECCD = 'ECCD',
   HDD = 'HDD',
-  SRD = 'SRD'
+  SRD = 'SRD',
+  LEO = 'LEO'
 }
 
 export enum ActivityStatus {
@@ -99,4 +101,7 @@ export class Activity extends BaseEntity {
 
   @OneToMany(() => Reminder, reminder => reminder.activity)
   reminders: Reminder[];
+
+  @OneToMany(() => SubActivity, subactivity => subactivity.activity)
+  subactivities: SubActivity[];
 } 
