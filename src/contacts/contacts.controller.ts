@@ -10,7 +10,8 @@ import {
   UseGuards,
   Request,
   ParseIntPipe,
-  ParseBoolPipe
+  ParseBoolPipe,
+  BadRequestException
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { ContactsService, ContactSearchParams } from './contacts.service';
@@ -157,8 +158,12 @@ export class ContactsController {
     @Body() createSuggestionDto: CreateContactSuggestionDto,
     @Request() req
   ) {
-    const userId = req.user.id;
-    return await this.contactsService.createSuggestion(createSuggestionDto, userId);
+    try {
+      const userId = req.user.id;
+      return await this.contactsService.createSuggestion(createSuggestionDto, userId);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   @Get('suggestions/all')

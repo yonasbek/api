@@ -5,15 +5,15 @@ import { Contact } from './contact.entity';
 import { User } from '../../users/entities/user.entity';
 
 export enum SuggestionStatus {
-  PENDING = 'pending',
-  APPROVED = 'approved',
-  REJECTED = 'rejected'
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED'
 }
 
 export enum SuggestionType {
-  UPDATE = 'update',
-  DELETE = 'delete',
-  ADD = 'add'
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE',
+  ADD = 'ADD'
 }
 
 @Entity('contact_suggestions')
@@ -58,7 +58,7 @@ export class ContactSuggestion extends BaseEntity {
     description: 'JSON object containing the suggested changes'
   })
   @Column({ type: 'json', nullable: true })
-  suggestedChanges?: Record<string, any>;
+  suggestedChanges?: object;
 
   @ApiProperty({ example: 'user-id-here', required: false })
   @Column({ nullable: true })

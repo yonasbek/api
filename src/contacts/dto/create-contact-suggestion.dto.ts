@@ -38,5 +38,5 @@ export class CreateContactSuggestionDto {
   })
   @IsOptional()
   @IsObject()
-  suggestedChanges?: Record<string, any>;
+  suggestedChanges?: object;
 } 

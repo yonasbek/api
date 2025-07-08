@@ -210,8 +210,10 @@ export class ContactsService {
     userId: string
   ): Promise<ContactSuggestion> {
     // Verify user exists
+    try{
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
+      console.log('user not found');
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
@@ -219,16 +221,30 @@ export class ContactsService {
     if (createSuggestionDto.contact_id) {
       const contact = await this.findOne(createSuggestionDto.contact_id);
       if (!contact) {
+        console.log('contact not found',createSuggestionDto.contact_id);
         throw new NotFoundException(`Contact with ID ${createSuggestionDto.contact_id} not found`);
       }
     }
+
+    console.log('Creating suggestion with data:', createSuggestionDto);
+    console.log('Suggested changes:', createSuggestionDto.suggestedChanges);
+    console.log('Location in suggested changes:', (createSuggestionDto.suggestedChanges as any)?.location);
 
     const suggestion = this.suggestionRepository.create({
       ...createSuggestionDto,
       suggested_by_user_id: userId
     });
-
-    return await this.suggestionRepository.save(suggestion);
+    console.log('Created suggestion object:', suggestion);
+    console.log('Suggestion suggestedChanges:', suggestion.suggestedChanges);
+    
+    const savedSuggestion = await this.suggestionRepository.save(suggestion);
+    console.log('Saved suggestion:', savedSuggestion);
+    
+    return savedSuggestion;
+    } catch (error) {
+      console.log(error,'error here');
+      return error
+    }
   }
 
   async findAllSuggestions(status?: SuggestionStatus): Promise<ContactSuggestion[]> {
@@ -274,10 +290,20 @@ export class ContactsService {
 
     // If approved, apply changes
     if (reviewDto.status === SuggestionStatus.APPROVED && suggestion.suggestedChanges) {
+      console.log('Applying approved changes:', suggestion.suggestedChanges);
+      
       if (suggestion.suggestionType === SuggestionType.UPDATE && suggestion.contact) {
+        console.log('Before update - contact location:', suggestion.contact.location);
+        console.log('Suggested changes location:', (suggestion.suggestedChanges as any).location);
+        
         // Apply changes to existing contact
         Object.assign(suggestion.contact, suggestion.suggestedChanges);
+        
+        console.log('After Object.assign - contact location:', suggestion.contact.location);
+        
         await this.contactRepository.save(suggestion.contact);
+        
+        console.log('After save - contact location:', suggestion.contact.location);
       } else if (suggestion.suggestionType === SuggestionType.ADD) {
         // Create new contact
         const newContact = this.contactRepository.create(suggestion.suggestedChanges);
