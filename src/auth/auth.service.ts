@@ -13,9 +13,9 @@ export class AuthService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
-  async register(registerDto: RegisterDto): Promise<{ token: string }> {
+  async register(registerDto: RegisterDto): Promise<{ token: string, fullName: string, email: string, role: string }> {
     const { email, password, fullName, phoneNumber, jobTitle, username, departmentId, roleId, supervisorName, comments } = registerDto;
 
     // Check if user exists
@@ -49,10 +49,10 @@ export class AuthService {
       email: user.email,
     });
 
-    return { token };
+    return { token, fullName: user.fullName, email: user.email, role: user.jobTitle };
   }
 
-  async login(loginDto: LoginDto): Promise<{ token: string }> {
+  async login(loginDto: LoginDto): Promise<{ token: string, fullName: string, email: string, role: string }> {
     const { email, password } = loginDto;
 
     // Find user
@@ -73,6 +73,6 @@ export class AuthService {
       email: user.email,
     });
 
-    return { token };
+    return { token, fullName: user.fullName, email: user.email, role: user.jobTitle };
   }
 } 
