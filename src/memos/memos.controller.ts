@@ -10,14 +10,19 @@ import {
   Query,
   UseInterceptors,
   UploadedFiles,
+  Res,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 import { MemosService } from './memos.service';
 import { CreateMemoDto } from './dto/create-memo.dto';
 import { UpdateMemoDto } from './dto/update-memo.dto';
+import { WorkflowActionDto } from './dto/workflow-action.dto';
 import { Memo } from './entities/memo.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+import { User } from '../users/entities/user.entity';
 
 @ApiTags('Memos')
 @ApiBearerAuth()
@@ -93,5 +98,77 @@ export class MemosController {
     @Param('filename') filename: string
   ): Promise<Memo> {
     return await this.memosService.removeAttachment(id, filename);
+  }
+
+  @Post(':id/workflow/submit-to-desk-head')
+  @ApiOperation({ summary: 'Submit memo to desk head for review' })
+  @ApiResponse({ status: 200, description: 'Memo submitted to desk head successfully', type: Memo })
+  async submitToDeskHead(
+    @Param('id') id: string,
+    @GetUser() user: User
+  ): Promise<Memo> {
+    return await this.memosService.submitToDeskHead(id, user.id);
+  }
+
+  @Post(':id/workflow/desk-head-action')
+  @ApiOperation({ summary: 'Desk head performs workflow action on memo' })
+  @ApiResponse({ status: 200, description: 'Desk head action performed successfully', type: Memo })
+  async deskHeadAction(
+    @Param('id') id: string,
+    @Body() workflowActionDto: WorkflowActionDto,
+    @GetUser() user: User
+  ): Promise<Memo> {
+    return await this.memosService.deskHeadAction(id, workflowActionDto, user.id);
+  }
+
+  @Post(':id/workflow/leo-action')
+  @ApiOperation({ summary: 'LEO performs workflow action on memo' })
+  @ApiResponse({ status: 200, description: 'LEO action performed successfully', type: Memo })
+  async leoAction(
+    @Param('id') id: string,
+    @Body() workflowActionDto: WorkflowActionDto,
+    @GetUser() user: User
+  ): Promise<Memo> {
+    return await this.memosService.leoAction(id, workflowActionDto, user.id);
+  }
+
+  @Get(':id/workflow/history')
+  @ApiOperation({ summary: 'Get workflow history for a memo' })
+  @ApiResponse({ status: 200, description: 'Return workflow history' })
+  async getWorkflowHistory(@Param('id') id: string): Promise<any> {
+    return await this.memosService.getWorkflowHistory(id);
+  }
+
+  @Get(':id/document')
+  @ApiOperation({ summary: 'Generate document data for approved memo' })
+  @ApiResponse({ status: 200, description: 'Return document data' })
+  async generateDocument(@Param('id') id: string): Promise<any> {
+    return await this.memosService.generateDocument(id);
+  }
+
+  @Get(':id/document/html')
+  @ApiOperation({ summary: 'Generate HTML document for printing' })
+  @ApiResponse({ status: 200, description: 'Return HTML document for printing' })
+  async generateHTMLDocument(
+    @Param('id') id: string,
+    @Res() res: Response
+  ): Promise<void> {
+    const htmlContent = await this.memosService.generateHTMLDocument(id);
+    res.setHeader('Content-Type', 'text/html');
+    res.send(htmlContent);
+  }
+
+  @Get('pending/desk-head')
+  @ApiOperation({ summary: 'Get memos pending desk head review' })
+  @ApiResponse({ status: 200, description: 'Return memos pending desk head review', type: [Memo] })
+  async getMemosPendingDeskHead(): Promise<Memo[]> {
+    return await this.memosService.getMemosPendingDeskHead();
+  }
+
+  @Get('pending/leo')
+  @ApiOperation({ summary: 'Get memos pending LEO review' })
+  @ApiResponse({ status: 200, description: 'Return memos pending LEO review', type: [Memo] })
+  async getMemosPendingLEO(): Promise<Memo[]> {
+    return await this.memosService.getMemosPendingLEO();
   }
 } 

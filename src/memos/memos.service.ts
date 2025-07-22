@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere } from 'typeorm';
 import { Memo } from './entities/memo.entity';
@@ -7,7 +7,8 @@ import { MemoSignature } from './entities/memo-signature.entity';
 import { CreateMemoDto } from './dto/create-memo.dto';
 import { UpdateMemoDto } from './dto/update-memo.dto';
 import { CreateSignatureDto, SignatureAction } from './dto/create-signature.dto';
-// import { UsersService } from '../users/users.service';
+import { WorkflowActionDto, WorkflowAction } from './dto/workflow-action.dto';
+import { DocumentGenerationService, DocumentData } from './document-generation.service';
 import { UploadService } from '../upload/upload.service';
 import { User } from '../users/entities/user.entity';
 import { Module } from '../upload/upload.entity';
@@ -21,7 +22,8 @@ export class MemosService {
     private readonly signatureRepository: Repository<MemoSignature>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-        private uploadService: UploadService,
+    private uploadService: UploadService,
+    private documentGenerationService: DocumentGenerationService,
   ) {}
 
   async create(createMemoDto: CreateMemoDto): Promise<Memo> {
@@ -189,7 +191,7 @@ export class MemosService {
     // if (!memo.approver_ids || memo.approver_ids.length === 0) {
     //   throw new BadRequestException('Must specify at least one approver');
     // }
-    memo.status = MemoStatus.PENDING;
+    memo.status = MemoStatus.PENDING_DESK_HEAD;
     return await this.memoRepository.save(memo);
   }
 
@@ -268,5 +270,196 @@ export class MemosService {
         signed_at: 'DESC',
       },
     });
+  }
+
+  /**
+   * Submit memo to desk head for review
+   */
+  async submitToDeskHead(id: string, userId: string): Promise<Memo> {
+    const memo = await this.findOne(id);
+    
+    if (memo.status !== MemoStatus.DRAFT) {
+      throw new BadRequestException('Can only submit memos in draft status');
+    }
+
+    memo.status = MemoStatus.PENDING_DESK_HEAD;
+    memo.submitted_to_desk_head_at = new Date();
+    
+    return await this.memoRepository.save(memo);
+  }
+
+  /**
+   * Desk head reviews memo and performs workflow action
+   */
+  async deskHeadAction(id: string, workflowActionDto: WorkflowActionDto, userId: string): Promise<Memo> {
+    const memo = await this.findOne(id);
+    const reviewer = await this.userRepository.findOne({ where: { id: userId } });
+    
+    // if (!reviewer) {
+    //   throw new NotFoundException('Reviewer not found');
+    // }
+
+    // if (memo.status !== MemoStatus.PENDING_DESK_HEAD) {
+    //   throw new BadRequestException('Memo is not pending desk head review');
+    // }
+
+    // TODO: Add role-based authorization check for desk head role
+
+    memo.desk_head_comment = workflowActionDto.comment;
+    memo.desk_head_reviewed_at = new Date();
+    memo.desk_head_reviewer = reviewer as User;
+
+    switch (workflowActionDto.action) {
+      case WorkflowAction.SUBMIT_TO_LEO:
+        memo.status = MemoStatus.PENDING_LEO;
+        memo.submitted_to_leo_at = new Date();
+        break;
+      case WorkflowAction.RETURN_TO_CREATOR:
+        memo.status = MemoStatus.RETURNED_TO_CREATOR;
+        break;
+      case WorkflowAction.REJECT:
+        memo.status = MemoStatus.REJECTED;
+        break;
+      default:
+        throw new BadRequestException('Invalid action for desk head');
+    }
+
+    return await this.memoRepository.save(memo);
+  }
+
+  /**
+   * LEO reviews memo and performs workflow action
+   */
+  async leoAction(id: string, workflowActionDto: WorkflowActionDto, userId: string): Promise<Memo> {
+    try {
+      
+   
+    const memo = await this.findOne(id);
+    const reviewer = await this.userRepository.findOne({ where: { id: userId } });
+    
+    // if (!reviewer) {
+    //   throw new NotFoundException('Reviewer not found');
+    // }
+
+    // if (memo.status !== MemoStatus.PENDING_LEO) {
+    //   throw new BadRequestException('Memo is not pending LEO review');
+    // }
+
+    // TODO: Add role-based authorization check for LEO role
+
+    memo.leo_comment = workflowActionDto.comment;
+    memo.leo_reviewed_at = new Date();
+    memo.leo_reviewer = reviewer as User;
+
+    switch (workflowActionDto.action) {
+      case WorkflowAction.APPROVE:
+        memo.status = MemoStatus.APPROVED;
+        memo.approved_at = new Date();
+        break;
+      case WorkflowAction.RETURN_TO_CREATOR:
+        memo.status = MemoStatus.RETURNED_TO_CREATOR;
+        break;
+      case WorkflowAction.REJECT:
+        memo.status = MemoStatus.REJECTED;
+        break;
+      default:
+        console.log(workflowActionDto.action);
+        throw new BadRequestException('Invalid action for LEO');
+    }
+
+    return await this.memoRepository.save(memo);
+ } catch (error) {
+  return error;
+ }
+  }
+
+  /**
+   * Generate document for approved memo
+   */
+  async generateDocument(id: string): Promise<any> {
+    const memo = await this.findOne(id);
+    
+    if (memo.status !== MemoStatus.APPROVED) {
+      throw new BadRequestException('Can only generate documents for approved memos');
+    }
+
+    const documentData = await this.documentGenerationService.generateDocument(memo);
+    return this.documentGenerationService.generateDocumentTemplate(documentData);
+  }
+
+  /**
+   * Generate HTML document for printing
+   */
+  async generateHTMLDocument(id: string): Promise<string> {
+    const memo = await this.findOne(id);
+    
+    if (memo.status !== MemoStatus.APPROVED) {
+      throw new BadRequestException('Can only generate documents for approved memos');
+    }
+
+    const documentData = await this.documentGenerationService.generateDocument(memo);
+    return this.documentGenerationService.generateDocumentHTML(documentData);
+  }
+
+  /**
+   * Get workflow history for a memo
+   */
+  async getWorkflowHistory(id: string): Promise<any> {
+    const memo = await this.memoRepository.findOne({
+      where: { id },
+      relations: ['desk_head_reviewer', 'leo_reviewer'],
+    });
+
+    if (!memo) {
+      throw new NotFoundException(`Memo with ID ${id} not found`);
+    }
+
+    return {
+      memoId: memo.id,
+      currentStatus: memo.status,
+      createdAt: memo.created_at,
+      submittedToDeskHeadAt: memo?.submitted_to_desk_head_at,
+      deskHeadReview: memo?.desk_head_reviewed_at ? {
+        reviewedAt: memo?.desk_head_reviewed_at,
+        reviewer: memo.desk_head_reviewer?.id || null,
+        reviewerName: memo?.desk_head_reviewer ? `${memo?.desk_head_reviewer?.firstName} ${memo?.desk_head_reviewer?.lastName}` : null,
+        comment: memo?.desk_head_comment,
+      } : null,.env
+      submittedToLeoAt: memo?.submitted_to_leo_at,
+      leoReview: memo?.leo_reviewed_at ? {
+        reviewedAt: memo?.leo_reviewed_at,
+        reviewer: memo?.leo_reviewer?.id || null,
+        reviewerName: memo?.leo_reviewer ? `${memo?.leo_reviewer?.firstName} ${memo?.leo_reviewer?.lastName}` : null,
+        comment: memo?.leo_comment,
+      } : null,
+      approvedAt: memo.approved_at,
+    };
+  }
+
+  /**
+   * Find memos by workflow status
+   */
+  async findMemosByWorkflowStatus(status: MemoStatus): Promise<Memo[]> {
+    return await this.memoRepository.find({
+      where: { status } as FindOptionsWhere<Memo>,
+      relations: ['recipients', 'desk_head_reviewer', 'leo_reviewer'],
+      order: {
+        created_at: 'DESC',
+      },
+    });
+  }
+
+  /**
+   * Get memos pending for desk head review
+   */
+  async getMemosPendingDeskHead(): Promise<Memo[]> {
+    return await this.findMemosByWorkflowStatus(MemoStatus.PENDING_DESK_HEAD);
+  }
+
+  /**
+   * Get memos pending for LEO review
+   */
+  async getMemosPendingLEO(): Promise<Memo[]> {
+    return await this.findMemosByWorkflowStatus(MemoStatus.PENDING_LEO);
   }
 } 

@@ -5,8 +5,10 @@ import { MemoType, PriorityLevel } from '../entities/memo.entity';
 
 export enum MemoStatus {
   DRAFT = 'DRAFT',
-  PENDING = 'PENDING',
+  PENDING_DESK_HEAD = 'PENDING_DESK_HEAD',
+  PENDING_LEO = 'PENDING_LEO',
   APPROVED = 'APPROVED',
+  RETURNED_TO_CREATOR = 'RETURNED_TO_CREATOR',
   REJECTED = 'REJECTED',
 }
 

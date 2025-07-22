@@ -1,4 +1,4 @@
-import { Entity, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, OneToMany, ManyToMany, JoinTable, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../../common/entities/base.entity';
 import { MemoSignature } from './memo-signature.entity';
 import { MemoStatus } from '../dto/create-memo.dto';
@@ -67,15 +67,6 @@ export class Memo extends BaseEntity {
   @Column()
   signature: string;
 
-  // @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
-  // @Column('uuid')
-  // author_id: string;
-
-  // @ApiProperty({ example: 'John Doe' })
-  // @Column()
-  // author_name: string;
-
-
   @ApiProperty({ enum: MemoStatus, example: MemoStatus.DRAFT })
   @Column({
     type: 'enum',
@@ -91,6 +82,37 @@ export class Memo extends BaseEntity {
   @ApiProperty({ example: '2024-03-20T10:00:00Z' })
   @Column('timestamp with time zone', { nullable: true })
   approved_at?: Date;
+
+  // Workflow fields
+  @ApiProperty({ example: 'This memo looks good, sending to LEO' })
+  @Column('text', { nullable: true })
+  desk_head_comment?: string;
+
+  @ApiProperty({ example: '2024-03-20T10:00:00Z' })
+  @Column('timestamp with time zone', { nullable: true })
+  desk_head_reviewed_at?: Date;
+
+  @ManyToOne(() => User, { nullable: true })
+  desk_head_reviewer?: User;
+
+  @ApiProperty({ example: 'Approved for publication' })
+  @Column('text', { nullable: true })
+  leo_comment?: string;
+
+  @ApiProperty({ example: '2024-03-20T10:00:00Z' })
+  @Column('timestamp with time zone', { nullable: true })
+  leo_reviewed_at?: Date;
+
+  @ManyToOne(() => User, { nullable: true })
+  leo_reviewer?: User;
+
+  @ApiProperty({ example: '2024-03-20T10:00:00Z' })
+  @Column('timestamp with time zone', { nullable: true })
+  submitted_to_desk_head_at?: Date;
+
+  @ApiProperty({ example: '2024-03-20T10:00:00Z' })
+  @Column('timestamp with time zone', { nullable: true })
+  submitted_to_leo_at?: Date;
 
   @OneToMany(() => MemoSignature, signature => signature.memo)
   signatures: MemoSignature[];
