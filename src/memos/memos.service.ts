@@ -424,7 +424,7 @@ export class MemosService {
         reviewer: memo.desk_head_reviewer?.id || null,
         reviewerName: memo?.desk_head_reviewer ? `${memo?.desk_head_reviewer?.firstName} ${memo?.desk_head_reviewer?.lastName}` : null,
         comment: memo?.desk_head_comment,
-      } : null,.env
+      } : null,
       submittedToLeoAt: memo?.submitted_to_leo_at,
       leoReview: memo?.leo_reviewed_at ? {
         reviewedAt: memo?.leo_reviewed_at,
