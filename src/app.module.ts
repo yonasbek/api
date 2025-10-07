@@ -17,6 +17,7 @@ import { PlansModule } from './plans/plans.module';
 import { UploadModule } from './upload/upload.module';
 import { UsersModule } from './users/users.module';
 import { ReportsModule } from './reports/reports.module';
+import { TrainingModule } from './training/training.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -37,6 +38,7 @@ import { ReportsModule } from './reports/reports.module';
     UploadModule,
     UsersModule,
     ReportsModule,
+    TrainingModule,
   ],
 })
 export class AppModule {} 
