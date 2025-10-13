@@ -12,3 +12,5 @@ export class AssignTrainerDto {
   trainer_ids: string[];
 }
 
+
+

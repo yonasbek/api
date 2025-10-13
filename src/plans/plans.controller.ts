@@ -86,4 +86,65 @@ export class PlansController {
   async remove(@Param('id') id: string): Promise<void> {
     return await this.plansService.remove(id);
   }
+
+  @Get('statistics/overall')
+  @ApiOperation({ summary: 'Get overall statistics for all plans and activities' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Returns total counts and statistics for plans and activities, including breakdown by plan type' 
+  })
+  async getOverallStatistics() {
+    return await this.plansService.getOverallStatistics();
+  }
+
+  @Get('statistics/type/:planType')
+  @ApiOperation({ summary: 'Get statistics for a specific plan type' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Returns detailed statistics for a specific plan type including all plans and their activities count' 
+  })
+  async getPlanTypeStatistics(@Param('planType') planType: PlanType) {
+    return await this.plansService.getPlanTypeStatistics(planType);
+  }
+
+  @Get(':id/progress-summary')
+  @ApiOperation({ summary: 'Get detailed progress summary for a plan' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Returns detailed progress breakdown of plan, activities, and subactivities' 
+  })
+  @ApiResponse({ status: 404, description: 'Plan not found' })
+  async getPlanProgressSummary(@Param('id') id: string) {
+    return await this.plansService.getPlanProgressSummary(id);
+  }
+
+  @Get(':id/debug-progress')
+  @ApiOperation({ summary: 'Debug endpoint to check progress calculation' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Returns detailed debug information about progress calculation' 
+  })
+  @ApiResponse({ status: 404, description: 'Plan not found' })
+  async debugPlanProgress(@Param('id') id: string) {
+    const plan = await this.plansService.findOne(id);
+    
+    return {
+      plan_id: plan.id,
+      plan_title: plan.title,
+      plan_progress: plan.progress,
+      calculated_progress: (plan as any).calculated_progress,
+      activities_count: plan.activities?.length || 0,
+      activities: plan.activities?.map(activity => ({
+        activity_id: activity.id,
+        activity_title: activity.title,
+        activity_progress: activity.progress,
+        subactivities_count: activity.subactivities?.length || 0,
+        subactivities: activity.subactivities?.map(sub => ({
+          subactivity_id: sub.id,
+          subactivity_title: sub.title,
+          subactivity_progress: sub.progress
+        })) || []
+      })) || []
+    };
+  }
 } 

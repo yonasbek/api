@@ -52,25 +52,51 @@ export class ActivitiesService {
   }
 
   async findAll(): Promise<Activity[]> {
-    return await this.activityRepository.find({
-      relations: ['plan', 'comments', 'attachments', 'reminders', 'subactivities'],
+    const activities = await this.activityRepository.find({
+      relations: ['plan', 'comments', 'attachments', 'reminders', 'subactivities', 'subactivities.user'],
       order: {
         start_date: 'ASC',
       },
     });
+
+    // Calculate progress for each activity based on subactivities
+    activities.forEach(activity => {
+      activity.progress = this.calculateActivityProgress(activity);
+    });
+
+    return activities;
   }
 
   async findOne(id: string): Promise<Activity> {
     const activity = await this.activityRepository.findOne({
       where: { id },
-      relations: ['plan', 'comments', 'attachments', 'reminders', 'subactivities'],
+      relations: ['plan', 'comments', 'attachments', 'reminders', 'subactivities', 'subactivities.user'],
     });
 
     if (!activity) {
       throw new NotFoundException(`Activity with ID ${id} not found`);
     }
 
+    // Calculate progress from subactivities
+    activity.progress = this.calculateActivityProgress(activity);
+
     return activity;
+  }
+
+  /**
+   * Calculate activity progress based on subactivities
+   */
+  private calculateActivityProgress(activity: Activity): number {
+    if (!activity.subactivities || activity.subactivities.length === 0) {
+      return activity.progress || 0; // Return stored progress if no subactivities
+    }
+
+    const totalProgress = activity.subactivities.reduce(
+      (sum, subactivity) => sum + (subactivity.progress || 0),
+      0
+    );
+
+    return Math.round(totalProgress / activity.subactivities.length);
   }
 
   async update(id: string, updateActivityDto: UpdateActivityDto): Promise<Activity> {
@@ -120,56 +146,91 @@ export class ActivitiesService {
   }
 
   async findByPlanId(planId: string): Promise<Activity[]> {
-    return await this.activityRepository.find({
+    const activities = await this.activityRepository.find({
       where: { plan_id: planId },
-      relations: ['comments', 'attachments', 'reminders', 'subactivities'],
+      relations: ['comments', 'attachments', 'reminders', 'subactivities', 'subactivities.user'],
       order: {
         start_date: 'ASC',
       },
     });
+
+    // Calculate progress for each activity based on subactivities
+    activities.forEach(activity => {
+      activity.progress = this.calculateActivityProgress(activity);
+    });
+
+    return activities;
   }
 
   async findByDateRange(startDate: Date, endDate: Date): Promise<Activity[]> {
-    return await this.activityRepository.find({
+    const activities = await this.activityRepository.find({
       where: {
         start_date: MoreThanOrEqual(startDate),
         end_date: LessThanOrEqual(endDate),
       },
-      relations: ['plan', 'comments', 'attachments', 'reminders'],
+      relations: ['plan', 'comments', 'attachments', 'reminders', 'subactivities', 'subactivities.user'],
       order: {
         start_date: 'ASC',
       },
     });
+
+    // Calculate progress for each activity based on subactivities
+    activities.forEach(activity => {
+      activity.progress = this.calculateActivityProgress(activity);
+    });
+
+    return activities;
   }
 
   async findByStatus(status: ActivityStatus): Promise<Activity[]> {
-    return await this.activityRepository.find({
+    const activities = await this.activityRepository.find({
       where: { status },
-      relations: ['plan', 'comments', 'attachments', 'reminders'],
+      relations: ['plan', 'comments', 'attachments', 'reminders', 'subactivities', 'subactivities.user'],
       order: {
         start_date: 'ASC',
       },
     });
+
+    // Calculate progress for each activity based on subactivities
+    activities.forEach(activity => {
+      activity.progress = this.calculateActivityProgress(activity);
+    });
+
+    return activities;
   }
 
   async findByPlanType(planType: PlanType): Promise<Activity[]> {
-    return await this.activityRepository.find({
+    const activities = await this.activityRepository.find({
       where: { plan_type: planType },
-      relations: ['plan', 'comments', 'attachments', 'reminders'],
+      relations: ['plan', 'comments', 'attachments', 'reminders', 'subactivities', 'subactivities.user'],
       order: {
         start_date: 'ASC',
       },
     });
+
+    // Calculate progress for each activity based on subactivities
+    activities.forEach(activity => {
+      activity.progress = this.calculateActivityProgress(activity);
+    });
+
+    return activities;
   }
 
   async findByPlanYear(year: string): Promise<Activity[]> {
-    return await this.activityRepository.find({
+    const activities = await this.activityRepository.find({
       where: { plan_year: year },
-      relations: ['plan', 'comments', 'attachments', 'reminders'],
+      relations: ['plan', 'comments', 'attachments', 'reminders', 'subactivities', 'subactivities.user'],
       order: {
         start_date: 'ASC',
       },
     });
+
+    // Calculate progress for each activity based on subactivities
+    activities.forEach(activity => {
+      activity.progress = this.calculateActivityProgress(activity);
+    });
+
+    return activities;
   }
 
   async getBudgetSummary(planId: string): Promise<{
@@ -209,8 +270,9 @@ export class ActivitiesService {
       DELAYED: 0,
     });
 
+    // Progress is now calculated from subactivities in findByPlanId
     const total_progress = activities.reduce((sum, activity) => sum + activity.progress, 0);
-    const average_progress = total_activities > 0 ? total_progress / total_activities : 0;
+    const average_progress = total_activities > 0 ? Math.round(total_progress / total_activities) : 0;
 
     return {
       total_activities,
@@ -224,10 +286,15 @@ export class ActivitiesService {
 
   async getGanttChartData(): Promise<GanttChartItemDto[]> {
     const activities = await this.activityRepository.find({
-      relations: ['plan'],
+      relations: ['plan', 'subactivities', 'subactivities.user'],
       order: {
         start_date: 'ASC',
       },
+    });
+
+    // Calculate progress for each activity based on subactivities
+    activities.forEach(activity => {
+      activity.progress = this.calculateActivityProgress(activity);
     });
 
     return activities.map(activity => ({

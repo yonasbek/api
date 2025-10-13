@@ -45,6 +45,10 @@ export class Plan extends BaseEntity {
   @Column({default: 0})
   budget_spent: number;
 
+  @ApiProperty({ example: 0, description: 'Overall progress percentage (0-100). Calculated from activities progress.' })
+  @Column('int', { default: 0 })
+  progress: number;
+
   @OneToMany(() => Activity, activity => activity.plan)
   activities: Activity[];
 } 

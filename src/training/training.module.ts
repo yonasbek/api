@@ -38,3 +38,5 @@ import { CourseEnrollment } from './entities/course-enrollment.entity';
 })
 export class TrainingModule {}
 
+
+
