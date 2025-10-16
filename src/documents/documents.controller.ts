@@ -33,8 +33,8 @@ export class DocumentsController {
       },
     },
   })
-  create(@UploadedFile() file: Multer.File, @Body() createDocumentDto: CreateDocumentDto) {
-    return this.documentsService.create(file, createDocumentDto);
+  async create(@UploadedFile() file: Express.Multer.File, @Body() createDocumentDto: CreateDocumentDto): Promise<import('./entities/document.entity').Document> {
+    return await this.documentsService.create(file, createDocumentDto);
   }
 
   @Get()

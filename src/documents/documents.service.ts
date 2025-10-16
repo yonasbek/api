@@ -20,7 +20,7 @@ export class DocumentsService {
     private readonly documentRepository: Repository<Document>,
   ) {}
 
-  async create(file: Multer.File, createDocumentDto: CreateDocumentDto): Promise<Document> {
+  async create(file: Express.Multer.File, createDocumentDto: CreateDocumentDto): Promise<Document> {
     if (!file) {
       throw new BadRequestException('File is required');
     }

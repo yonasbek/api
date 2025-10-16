@@ -63,4 +63,7 @@ export class SubActivity extends BaseEntity {
 
   @Column()
   activity_id: string;
+
+  @Column({ nullable: true })
+  weight?: number;
 } 
