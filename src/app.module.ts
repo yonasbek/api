@@ -19,6 +19,7 @@ import { UsersModule } from './users/users.module';
 import { ReportsModule } from './reports/reports.module';
 import { TrainingModule } from './training/training.module';
 import { ImportModule } from './import/import.module';
+import { MedicalServicesModule } from './medical-services/medical-services.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -41,6 +42,7 @@ import { ImportModule } from './import/import.module';
     ReportsModule,
     TrainingModule,
     ImportModule,
+    MedicalServicesModule,
   ],
 })
-export class AppModule {} 
+export class AppModule { } 

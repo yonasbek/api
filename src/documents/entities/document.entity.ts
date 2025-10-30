@@ -51,7 +51,7 @@ export class Document {
 
   @ManyToMany(() => Tag)
   @JoinTable({
-    name: 'document_tags',
+    name: 'document_tag_relations',
     joinColumn: { name: 'document_id', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' }
   })

@@ -11,13 +11,15 @@ import { SubActivity } from './entities/subactivity.entity';
 import { User } from '../users/entities/user.entity';
 import { UploadService } from '../upload/upload.service';
 import { Uploads } from '../upload/upload.entity';
+// import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Activity, ActivityComment, ActivityAttachment, SubActivity, User, Uploads]),
+    // NotificationsModule,
   ],
   controllers: [ActivitiesController, SubActivitiesController],
   providers: [ActivitiesService, SubActivitiesService, UploadService],
   exports: [ActivitiesService, SubActivitiesService],
 })
-export class ActivitiesModule {} 
+export class ActivitiesModule { } 

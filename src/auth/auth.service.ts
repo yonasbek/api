@@ -52,7 +52,7 @@ export class AuthService {
     return { token, fullName: user.fullName, email: user.email, role: user.jobTitle };
   }
 
-  async login(loginDto: LoginDto): Promise<{ token: string, fullName: string, email: string, role: string }> {
+  async login(loginDto: LoginDto): Promise<{ token: string, id: string, fullName: string, email: string, role: string, phoneNumber: string, jobTitle: string, supervisorName: string, comments: string, isActive: boolean, roleId: string, departmentId: string }> {
     const { email, password } = loginDto;
 
     // Find user
@@ -73,6 +73,19 @@ export class AuthService {
       email: user.email,
     });
 
-    return { token, fullName: user.fullName, email: user.email, role: user.jobTitle };
+    return {
+      token,
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.jobTitle,
+      phoneNumber: user.phoneNumber,
+      jobTitle: user.jobTitle,
+      supervisorName: user.supervisorName,
+      comments: user.comments,
+      isActive: user.isActive,
+      roleId: user.roleId,
+      departmentId: user.departmentId,
+    };
   }
 } 
