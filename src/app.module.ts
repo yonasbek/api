@@ -19,6 +19,7 @@ import { UsersModule } from './users/users.module';
 import { ReportsModule } from './reports/reports.module';
 import { TrainingModule } from './training/training.module';
 import { ImportModule } from './import/import.module';
+import { NotificationModule } from './notification/notification.module';
 import { MedicalServicesModule } from './medical-services/medical-services.module';
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { MedicalServicesModule } from './medical-services/medical-services.modul
     TrainingModule,
     ImportModule,
     MedicalServicesModule,
+    NotificationModule,
   ],
 })
 export class AppModule { } 
