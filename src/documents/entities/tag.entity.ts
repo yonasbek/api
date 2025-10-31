@@ -3,7 +3,7 @@ import { BaseEntity } from '../../common/entities/base.entity';
 import { Document } from './document.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
-@Entity('tags')
+@Entity('document_tags')
 export class Tag extends BaseEntity {
   @ApiProperty({ example: 'Important' })
   @Column({ unique: true })

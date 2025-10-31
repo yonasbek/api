@@ -14,6 +14,7 @@ import { Week } from './entities/week.entity';
 import { User } from '../users/entities/user.entity';
 import { UploadService } from '../upload/upload.service';
 import { Uploads } from '../upload/upload.entity';
+// import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -23,4 +24,4 @@ import { Uploads } from '../upload/upload.entity';
   providers: [ActivitiesService, SubActivitiesService, WeeksService, UploadService],
   exports: [ActivitiesService, SubActivitiesService, WeeksService],
 })
-export class ActivitiesModule {} 
+export class ActivitiesModule { } 
