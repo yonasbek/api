@@ -2,6 +2,7 @@ import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from '../../common/entities/base.entity';
 import { Activity } from './activity.entity';
 import { User } from '../../users/entities/user.entity';
+import { Week } from './week.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum ActivityStatus {
@@ -29,13 +30,21 @@ export class SubActivity extends BaseEntity {
   @Column()
   user_id: string;
 
-  @ApiProperty({ example: '2024-01-01' })
-  @Column('date')
-  start_date: Date;
+  @ManyToOne(() => Week, { eager: true })
+  @JoinColumn({ name: 'start_week_id' })
+  start_week: Week;
 
-  @ApiProperty({ example: '2024-01-15' })
-  @Column('date')
-  end_date: Date;
+  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
+  @Column()
+  start_week_id: string;
+
+  @ManyToOne(() => Week, { eager: true })
+  @JoinColumn({ name: 'end_week_id' })
+  end_week: Week;
+
+  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
+  @Column()
+  end_week_id: string;
 
   @ApiProperty({ enum: ActivityStatus})
   @Column({

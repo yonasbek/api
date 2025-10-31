@@ -1,5 +1,4 @@
-import { IsString, IsNotEmpty, IsDate, IsEnum, IsNumber, IsUUID, IsOptional } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsString, IsNotEmpty, IsEnum, IsNumber, IsUUID, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ActivityStatus } from '../entities/activity.entity';
 
@@ -19,15 +18,15 @@ export class CreateSubActivityDto {
   @IsNotEmpty()
   user_id: string;
 
-  @ApiProperty({ example: '2024-01-01' })
-  @Type(() => Date)
-  @IsDate()
-  start_date: Date;
+  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
+  @IsUUID()
+  @IsNotEmpty()
+  start_week_id: string;
 
-  @ApiProperty({ example: '2024-01-15' })
-  @Type(() => Date)
-  @IsDate()
-  end_date: Date;
+  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
+  @IsUUID()
+  @IsNotEmpty()
+  end_week_id: string;
 
   @ApiProperty({ enum: ActivityStatus, example: ActivityStatus.NOT_STARTED })
   @IsEnum(ActivityStatus)

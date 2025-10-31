@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { SubActivity } from './entities/subactivity.entity';
 import { Activity, ActivityStatus } from './entities/activity.entity';
 import { User } from '../users/entities/user.entity';
+import { Week } from './entities/week.entity';
 import { CreateSubActivityDto } from './dto/create-subactivity.dto';
 import { UpdateSubActivityDto } from './dto/update-subactivity.dto';
 import { UpdateSubActivityProgressDto } from './dto/update-subactivity-progress.dto';
@@ -17,6 +18,8 @@ export class SubActivitiesService {
     private activityRepository: Repository<Activity>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Week)
+    private weekRepository: Repository<Week>,
   ) {}
 
   async create(createSubActivityDto: CreateSubActivityDto): Promise<SubActivity> {
@@ -38,30 +41,47 @@ export class SubActivitiesService {
       throw new NotFoundException(`User with ID ${createSubActivityDto.user_id} not found`);
     }
 
+    // Verify the weeks exist
+    const startWeek = await this.weekRepository.findOne({
+      where: { id: createSubActivityDto.start_week_id }
+    });
+
+    if (!startWeek) {
+      throw new NotFoundException(`Week with ID ${createSubActivityDto.start_week_id} not found`);
+    }
+
+    const endWeek = await this.weekRepository.findOne({
+      where: { id: createSubActivityDto.end_week_id }
+    });
+
+    if (!endWeek) {
+      throw new NotFoundException(`Week with ID ${createSubActivityDto.end_week_id} not found`);
+    }
+
     const subActivity = this.subActivityRepository.create(createSubActivityDto);
     return await this.subActivityRepository.save(subActivity);
   }
 
   async findAll(): Promise<SubActivity[]> {
     return await this.subActivityRepository.find({
-      relations: ['activity', 'user'],
-      order: { start_date: 'ASC' }
+      relations: ['activity', 'user', 'start_week', 'end_week'],
+      order: { created_at: 'ASC' }
     });
   }
 
   async findByActivityId(activityId: string): Promise<SubActivity[]> {
     return await this.subActivityRepository.find({
       where: { activity_id: activityId },
-      relations: ['activity', 'user'],
-      order: { start_date: 'ASC' }
+      relations: ['activity', 'user', 'start_week', 'end_week'],
+      order: { created_at: 'ASC' }
     });
   }
 
   async findByUserId(userId: string): Promise<SubActivity[]> {
     return await this.subActivityRepository.find({
       where: { user_id: userId },
-      relations: ['activity', 'user'],
-      order: { start_date: 'ASC' }
+      relations: ['activity', 'user', 'start_week', 'end_week'],
+      order: { created_at: 'ASC' }
     });
   }
 
@@ -76,15 +96,15 @@ export class SubActivitiesService {
 
     return await this.subActivityRepository.find({
       where: { user_id: user.id },
-      relations: ['activity', 'user'],
-      order: { start_date: 'ASC' }
+      relations: ['activity', 'user', 'start_week', 'end_week'],
+      order: { created_at: 'ASC' }
     });
   }
 
   async findOne(id: string): Promise<SubActivity> {
     const subActivity = await this.subActivityRepository.findOne({
       where: { id },
-      relations: ['activity', 'user']
+      relations: ['activity', 'user', 'start_week', 'end_week']
     });
 
     if (!subActivity) {
@@ -105,6 +125,28 @@ export class SubActivitiesService {
 
       if (!user) {
         throw new NotFoundException(`User with ID ${updateSubActivityDto.user_id} not found`);
+      }
+    }
+
+    // If start_week_id is being updated, verify the week exists
+    if (updateSubActivityDto.start_week_id && updateSubActivityDto.start_week_id !== subActivity.start_week_id) {
+      const startWeek = await this.weekRepository.findOne({
+        where: { id: updateSubActivityDto.start_week_id }
+      });
+
+      if (!startWeek) {
+        throw new NotFoundException(`Week with ID ${updateSubActivityDto.start_week_id} not found`);
+      }
+    }
+
+    // If end_week_id is being updated, verify the week exists
+    if (updateSubActivityDto.end_week_id && updateSubActivityDto.end_week_id !== subActivity.end_week_id) {
+      const endWeek = await this.weekRepository.findOne({
+        where: { id: updateSubActivityDto.end_week_id }
+      });
+
+      if (!endWeek) {
+        throw new NotFoundException(`Week with ID ${updateSubActivityDto.end_week_id} not found`);
       }
     }
 
