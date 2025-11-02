@@ -62,16 +62,16 @@ export class NotificationService {
           ? `Task "${task.title}" is overdue by ${Math.abs(diffDays)} day(s).`
           : `Task "${task.title}" is due in ${diffDays} day(s).`;
 
-      const category = diffDays < 0 ? 'overdue' : 'due_soon';
+      const status = diffDays < 0 ? 'overdue' : 'due_soon';
       const existing = await this.notificationRepository.findOne({
-        where: { related_task: { id: task.id }, category },
+        where: { related_task: { id: task.id }, status },
       });
 
       if (!existing) {
         await this.create({
           title,
           message,
-          category,
+          status,
           related_task: task,
           user,
         });
@@ -110,14 +110,14 @@ export class NotificationService {
     for (const task of tasks) {
       const endDate = new Date(task.end_date);
       const diffDays = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-      let category: string | null = null;
+      let status: string | null = null;
 
-      if (diffDays < 0) category = 'overdue';
-      else if (diffDays <= 7) category = 'due_soon';
-      if (!category) continue;
+      if (diffDays < 0) status = 'overdue';
+      else if (diffDays <= 7) status = 'due_soon';
+      if (!status) continue;
 
       const existing = await this.notificationRepository.findOne({
-        where: { related_task: { id: task.id }, category },
+        where: { related_task: { id: task.id }, status },
       });
       if (!existing) {
         const message =
@@ -128,7 +128,7 @@ export class NotificationService {
         await this.create({
           title: task.title ?? 'Task notification',
           message,
-          category,
+          status,
           related_task: task,
           user: task.user,
         });

@@ -15,7 +15,7 @@ export class Notification {
   message: string;
 
   @Column({ length: 50, nullable: true })
-  category: string; // e.g., 'due_soon', 'overdue', etc.
+  status: string; // e.g., 'due_soon', 'overdue', etc.
 
   @ManyToOne(() => SubActivity, { onDelete: 'CASCADE' })
   related_task: SubActivity;
