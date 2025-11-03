@@ -25,7 +25,7 @@ export class NotificationScheduler {
     });
 
     for (const sub of subActivities) {
-      const endDate = new Date(sub.end_date);
+      const endDate = new Date(sub?.end_date ?? '');
 
       // Overdue
       if (isBefore(endDate, today)) {

@@ -5,11 +5,11 @@ import { User } from '../../users/entities/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum ActivityStatus {
-    NOT_STARTED = 'NOT_STARTED',
-    IN_PROGRESS = 'IN_PROGRESS',
-    COMPLETED = 'COMPLETED',
-    DELAYED = 'DELAYED'
-  }
+  NOT_STARTED = 'NOT_STARTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  DELAYED = 'DELAYED'
+}
 
 @Entity('subactivities')
 export class SubActivity extends BaseEntity {
@@ -29,15 +29,15 @@ export class SubActivity extends BaseEntity {
   @Column()
   user_id: string;
 
-  @ApiProperty({ example: '2024-01-01' })
-  @Column('date')
-  start_date: Date;
+  @ApiProperty({ example: '2024-01-01', nullable: true })
+  @Column('date', { nullable: true })
+  start_date?: Date;
 
-  @ApiProperty({ example: '2024-01-15' })
-  @Column('date')
-  end_date: Date;
+  @ApiProperty({ example: '2024-01-15', nullable: true })
+  @Column('date', { nullable: true })
+  end_date?: Date;
 
-  @ApiProperty({ enum: ActivityStatus})
+  @ApiProperty({ enum: ActivityStatus })
   @Column({
     type: 'enum',
     enum: ActivityStatus,

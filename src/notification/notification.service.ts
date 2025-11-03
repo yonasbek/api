@@ -19,7 +19,7 @@ export class NotificationService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   // ----- create notification -----
   async create(notificationData: Partial<Notification>): Promise<Notification> {
@@ -49,7 +49,7 @@ export class NotificationService {
     if (!task.end_date || task.status === ActivityStatus.COMPLETED) return;
 
     const today = new Date();
-    const endDate = new Date(task.end_date);
+    const endDate = new Date(task?.end_date ?? '');
     const diffDays = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
     if (diffDays < 0 || diffDays <= 7) {
@@ -108,7 +108,7 @@ export class NotificationService {
 
     let createdCount = 0;
     for (const task of tasks) {
-      const endDate = new Date(task.end_date);
+      const endDate = new Date(task?.end_date ?? '');
       const diffDays = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
       let status: string | null = null;
 
