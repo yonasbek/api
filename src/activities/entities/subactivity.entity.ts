@@ -6,11 +6,11 @@ import { Week } from './week.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum ActivityStatus {
-    NOT_STARTED = 'NOT_STARTED',
-    IN_PROGRESS = 'IN_PROGRESS',
-    COMPLETED = 'COMPLETED',
-    DELAYED = 'DELAYED'
-  }
+  NOT_STARTED = 'NOT_STARTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  DELAYED = 'DELAYED'
+}
 
 @Entity('subactivities')
 export class SubActivity extends BaseEntity {
@@ -45,8 +45,15 @@ export class SubActivity extends BaseEntity {
   @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
   @Column({ nullable: true })
   end_week_id: string;
+  @ApiProperty({ example: '2024-01-01', nullable: true })
+  @Column('date', { nullable: true })
+  start_date?: Date;
 
-  @ApiProperty({ enum: ActivityStatus})
+  @ApiProperty({ example: '2024-01-15', nullable: true })
+  @Column('date', { nullable: true })
+  end_date?: Date;
+
+  @ApiProperty({ enum: ActivityStatus })
   @Column({
     type: 'enum',
     enum: ActivityStatus,
