@@ -50,6 +50,8 @@ export class PlansService {
     if (!plan.activities || plan.activities.length === 0) {
       console.log('No activities found, setting progress to 0');
       (plan as any).calculated_progress = plan.progress || 0;
+      // Set status to draft if no activities
+      plan.status = 'draft';
       return;
     }
 
@@ -76,7 +78,69 @@ export class PlansService {
     // Also update the progress field for convenience (won't be persisted to DB)
     plan.progress = calculatedProgress;
     
+    // Step 3: Calculate and set plan status based on activities and sub-activities
+    plan.status = this.calculatePlanStatus(plan);
+    console.log(`Plan status set to: ${plan.status}`);
+    
     console.log(`=== Plan "${plan.title}" final progress: ${calculatedProgress}% ===\n`);
+  }
+
+  /**
+   * Calculate plan status based on activities and sub-activities
+   * - "completed": All activities and all sub-activities are completed (progress = 100 or status = COMPLETED)
+   * - "active": At least one activity or sub-activity is in progress (progress > 0 and < 100 or status = IN_PROGRESS)
+   * - "draft": No activities or all activities/sub-activities are not started (progress = 0 or status = NOT_STARTED)
+   */
+  private calculatePlanStatus(plan: Plan): string {
+    if (!plan.activities || plan.activities.length === 0) {
+      return 'draft';
+    }
+
+    let allCompleted = true;
+    let hasInProgress = false;
+
+    // Check each activity
+    for (const activity of plan.activities) {
+      // Check if activity itself is completed
+      const activityCompleted = activity.progress === 100 || activity.status === 'COMPLETED';
+      const activityInProgress = (activity.progress > 0 && activity.progress < 100) || activity.status === 'IN_PROGRESS';
+
+      if (!activityCompleted) {
+        allCompleted = false;
+      }
+      if (activityInProgress) {
+        hasInProgress = true;
+      }
+
+      // Check sub-activities
+      if (activity.subactivities && activity.subactivities.length > 0) {
+        for (const subActivity of activity.subactivities) {
+          const subCompleted = subActivity.progress === 100 || subActivity.status === 'COMPLETED';
+          const subInProgress = (subActivity.progress > 0 && subActivity.progress < 100) || subActivity.status === 'IN_PROGRESS';
+
+          if (!subCompleted) {
+            allCompleted = false;
+          }
+          if (subInProgress) {
+            hasInProgress = true;
+          }
+        }
+      } else {
+        // If activity has no sub-activities, use activity status
+        if (!activityCompleted) {
+          allCompleted = false;
+        }
+      }
+    }
+
+    // Determine status
+    if (allCompleted) {
+      return 'completed';
+    } else if (hasInProgress) {
+      return 'active';
+    } else {
+      return 'draft';
+    }
   }
 
   /**
@@ -151,7 +215,7 @@ export class PlansService {
 
   async findByOwner(owner: string): Promise<Plan[]> {
     const plans = await this.planRepository.find({
-      where: { owner },
+     
       relations: ['activities', 'activities.subactivities', 'activities.subactivities.user'],
       order: {
         created_at: 'DESC',
@@ -229,6 +293,8 @@ export class PlansService {
       (sum, plan) => sum + (plan.activities?.length || 0),
       0
     );
+    // Calculate active and completed plans based on activities and sub-activities
+    // Status is calculated in calculatePlanProgress method which is called for each plan above
     const active_plans = plans.filter(p => p.status === 'active').length;
     const completed_plans = plans.filter(p => p.status === 'completed').length;
 
@@ -279,7 +345,6 @@ export class PlansService {
       plan_id: string;
       plan_title: string;
       fiscal_year: string;
-      status: string;
       progress: number;
       activities_count: number;
     }>;
@@ -299,6 +364,8 @@ export class PlansService {
       (sum, plan) => sum + (plan.activities?.length || 0),
       0
     );
+    // Calculate active and completed plans based on activities and sub-activities
+    // Status is calculated in calculatePlanProgress method which is called for each plan above
     const active_plans = plans.filter(p => p.status === 'active').length;
     const completed_plans = plans.filter(p => p.status === 'completed').length;
     
@@ -314,7 +381,6 @@ export class PlansService {
       plan_id: plan.id,
       plan_title: plan.title,
       fiscal_year: plan.fiscal_year,
-      status: plan.status,
       progress: plan.progress || 0,
       activities_count: plan.activities?.length || 0,
     }));

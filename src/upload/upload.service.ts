@@ -25,11 +25,12 @@ export class UploadService {
     }
   }
 
-  async uploadFiles(files: Express.Multer.File[], module: Module): Promise<string[]> {
+  async uploadFiles(files: Express.Multer.File[], module: Module, requiresApproval: boolean = false): Promise<string[]> {
     if (!files || files.length === 0) {
       throw new BadRequestException('No files provided');
     }
 
+    console.log(requiresApproval == true, 'requiresApproval');
 
 
     const savedFiles: string[] = [];
@@ -50,6 +51,8 @@ export class UploadService {
         upload.document_size = file.size;
         upload.upload_date = new Date();
         upload.module = module;
+        upload.requires_approval = requiresApproval;
+        upload.status = requiresApproval ? 'pending' : 'published';
         await this.uploadRepository.save(upload);
         savedFiles.push(fileName);
       } catch (error) {
@@ -83,10 +86,14 @@ export class UploadService {
     }
   }
 
-  async listFiles(): Promise<Uploads[]> {
+  async listFiles(status?: string): Promise<Uploads[]> {
     try {
       console.log('Listing files');
-      return await this.uploadRepository.find();
+      const where = status ? { status } : {};
+      return await this.uploadRepository.find({
+        where,
+        order: { upload_date: 'DESC' }
+      });
     } catch (error) {
       console.log('Error listing files:', error);
       throw new BadRequestException('Failed to list files');
@@ -95,5 +102,36 @@ export class UploadService {
 
   async deleteFile(id: string): Promise<void> {
     await this.uploadRepository.delete(id);
+  }
+
+  async listPendingFiles(): Promise<Uploads[]> {
+    try {
+      return await this.uploadRepository.find({
+        where: { status: 'pending', requires_approval: true },
+        order: { upload_date: 'DESC' }
+      });
+    } catch (error) {
+      console.log('Error listing pending files:', error);
+      throw new BadRequestException('Failed to list pending files');
+    }
+  }
+
+  async approveFile(id: string): Promise<Uploads> {
+    const file = await this.uploadRepository.findOne({ where: { id } });
+    if (!file) {
+      throw new BadRequestException('File not found');
+    }
+    file.status = 'published';
+    file.requires_approval = false;
+    return await this.uploadRepository.save(file);
+  }
+
+  async rejectFile(id: string): Promise<Uploads> {
+    const file = await this.uploadRepository.findOne({ where: { id } });
+    if (!file) {
+      throw new BadRequestException('File not found');
+    }
+    file.status = 'rejected';
+    return await this.uploadRepository.save(file);
   }
 } 

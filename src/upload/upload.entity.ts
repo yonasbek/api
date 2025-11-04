@@ -37,4 +37,12 @@ export class Uploads extends BaseEntity {
   @ApiProperty({ example: 'Activity' })
   @Column({ nullable: true })
   module: string;
+
+  @ApiProperty({ example: 'pending', description: 'Document status: pending, published, rejected' })
+  @Column({ default: 'published', nullable: true })
+  status: string;
+
+  @ApiProperty({ example: false, description: 'Whether document requires approval' })
+  @Column({ default: false, nullable: true })
+  requires_approval: boolean;
 } 

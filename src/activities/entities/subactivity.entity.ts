@@ -35,7 +35,7 @@ export class SubActivity extends BaseEntity {
   start_week: Week;
 
   @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
-  @Column()
+  @Column({ nullable: true })
   start_week_id: string;
 
   @ManyToOne(() => Week, { eager: true })
@@ -43,7 +43,7 @@ export class SubActivity extends BaseEntity {
   end_week: Week;
 
   @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
-  @Column()
+  @Column({ nullable: true })
   end_week_id: string;
 
   @ApiProperty({ enum: ActivityStatus})
