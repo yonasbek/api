@@ -32,7 +32,7 @@ export class NotificationScheduler {
         await this.notificationService.create({
           title: 'Task Overdue',
           message: `Your task "${sub.title}" is overdue.`,
-          category: 'overdue',
+          status: 'overdue',
           related_task: sub,
           user: sub.user,
         });
@@ -42,7 +42,7 @@ export class NotificationScheduler {
         await this.notificationService.create({
           title: 'Task Due Soon',
           message: `Your task "${sub.title}" is due on ${sub.end_date}.`,
-          category: 'due_soon',
+          status: 'due_soon',
           related_task: sub,
           user: sub.user,
         });
