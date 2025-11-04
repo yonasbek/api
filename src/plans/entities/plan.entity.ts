@@ -21,9 +21,9 @@ export class Plan extends BaseEntity {
   @Column()
   fiscal_year: string;
 
-  @ApiProperty({ example: 'John Doe' })
-  @Column()
-  owner: string;
+  @ApiProperty({ example: 'John Doe', nullable: true })
+  @Column({nullable: true})
+  owner?: string;
 
   @ApiProperty({ example: 'PFRD', enum: PlanType })
   @Column({
@@ -33,9 +33,9 @@ export class Plan extends BaseEntity {
   })
   plan_type: PlanType;
 
-  @ApiProperty({ example: 'draft' })
-  @Column({default: 'draft'})
-  status: string;
+  @ApiProperty({ example: 'draft', description: 'Plan status: draft, active, completed, cancelled. Calculated from activities and sub-activities.' })
+  @Column({default: 'draft', nullable: true})
+  status?: string;
 
   @ApiProperty({ example: '10000' })
   @Column({default: 0})
@@ -44,6 +44,10 @@ export class Plan extends BaseEntity {
   @ApiProperty({ example: '10000' })
   @Column({default: 0})
   budget_spent: number;
+
+  @ApiProperty({ example: ['internal', 'donor'], description: 'Budget sources: internal, donor, government, partner' })
+  @Column('simple-array', { nullable: true, default: [] })
+  budget_source: string[];
 
   @ApiProperty({ example: 0, description: 'Overall progress percentage (0-100). Calculated from activities progress.' })
   @Column('int', { default: 0 })

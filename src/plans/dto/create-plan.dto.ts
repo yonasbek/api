@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, IsEnum, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsEnum, IsOptional, IsArray } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { PlanType } from '../entities/plan.entity';
 
@@ -15,7 +15,7 @@ export class CreatePlanDto {
 
   @ApiProperty({ example: 'John Doe' })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   owner: string;
 
   @ApiProperty({ example: 'PFRD', enum: PlanType })
@@ -31,4 +31,10 @@ export class CreatePlanDto {
   @IsNumber()
   @IsOptional()
   budget_allocated?: number;
+
+  @ApiProperty({ example: ['internal', 'donor'], description: 'Budget sources: internal, donor, government, partner' })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  budget_source?: string[];
 } 

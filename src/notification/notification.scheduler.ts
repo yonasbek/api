@@ -12,7 +12,7 @@ export class NotificationScheduler {
     @InjectRepository(SubActivity)
     private readonly subActivityRepo: Repository<SubActivity>,
     private readonly notificationService: NotificationService,
-  ) {}
+  ) { }
 
   // Run every day at 8:00 AM
   @Cron(CronExpression.EVERY_DAY_AT_8AM)
@@ -25,7 +25,7 @@ export class NotificationScheduler {
     });
 
     for (const sub of subActivities) {
-      const endDate = new Date(sub.end_date);
+      const endDate = new Date(sub?.end_date ?? '');
 
       // Overdue
       if (isBefore(endDate, today)) {
