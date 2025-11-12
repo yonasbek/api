@@ -104,4 +104,8 @@ export class Activity extends BaseEntity {
 
   @OneToMany(() => SubActivity, subactivity => subactivity.activity)
   subactivities: SubActivity[];
+
+  @ApiProperty({ example: false, description: 'Whether this is a flagship activity' })
+  @Column({ default: false, nullable: true })
+  flagship_activity: boolean;
 } 

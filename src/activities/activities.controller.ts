@@ -50,7 +50,11 @@ export class ActivitiesController {
   async findAll(
     @Query('plan_id') planId?: string,
     @Query('status') status?: ActivityStatus,
+    @Query('flagship') flagship?: string,
   ): Promise<Activity[]> {
+    if (flagship === 'true') {
+      return await this.activitiesService.findFlagshipActivities();
+    }
     if (planId) {
       return await this.activitiesService.findByPlanId(planId);
     }

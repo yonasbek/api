@@ -162,6 +162,23 @@ export class ActivitiesService {
     return activities;
   }
 
+  async findFlagshipActivities(): Promise<Activity[]> {
+    const activities = await this.activityRepository.find({
+      where: { flagship_activity: true },
+      relations: ['plan', 'subactivities', 'subactivities.user', 'subactivities.start_week', 'subactivities.end_week'],
+      order: {
+        created_at: 'DESC',
+      },
+    });
+
+    // Calculate progress for each activity based on subactivities
+    activities.forEach(activity => {
+      activity.progress = this.calculateActivityProgress(activity);
+    });
+
+    return activities;
+  }
+
   async findByDateRange(startDate: Date, endDate: Date): Promise<Activity[]> {
     const activities = await this.activityRepository.find({
       where: {

@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsDate, IsEnum, IsNumber, IsUUID, IsOptional, IsArray } from 'class-validator';
+import { IsString, IsNotEmpty, IsDate, IsEnum, IsNumber, IsUUID, IsOptional, IsArray, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { ActivityStatus, PlanType } from '../entities/activity.entity';
@@ -71,4 +71,9 @@ export class CreateActivityDto {
   @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
   @IsUUID()
   plan_id: string;
+
+  @ApiProperty({ example: false, description: 'Whether this is a flagship activity' })
+  @IsBoolean()
+  @IsOptional()
+  flagship_activity?: boolean;
 } 
