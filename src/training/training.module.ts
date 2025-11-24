@@ -1,39 +1,23 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CoursesController } from './controllers/courses.controller';
-import { TrainersController } from './controllers/trainers.controller';
-import { TraineesController } from './controllers/trainees.controller';
-import { EnrollmentsController } from './controllers/enrollments.controller';
-import { CoursesService } from './services/courses.service';
-import { TrainersService } from './services/trainers.service';
-import { TraineesService } from './services/trainees.service';
-import { EnrollmentsService } from './services/enrollments.service';
-import { Course } from './entities/course.entity';
-import { Trainer } from './entities/trainer.entity';
-import { Trainee } from './entities/trainee.entity';
-import { CourseEnrollment } from './entities/course-enrollment.entity';
+import { TrainingsController } from './controllers/trainings.controller';
+import { TrainingsService } from './services/trainings.service';
+import { Training } from './entities/training.entity';
+import { UploadModule } from '../upload/upload.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Course, Trainer, Trainee, CourseEnrollment])
+    TypeOrmModule.forFeature([Training]),
+    UploadModule
   ],
   controllers: [
-    CoursesController,
-    TrainersController,
-    TraineesController,
-    EnrollmentsController
+    TrainingsController
   ],
   providers: [
-    CoursesService,
-    TrainersService,
-    TraineesService,
-    EnrollmentsService
+    TrainingsService
   ],
   exports: [
-    CoursesService,
-    TrainersService,
-    TraineesService,
-    EnrollmentsService
+    TrainingsService
   ]
 })
 export class TrainingModule {}

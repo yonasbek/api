@@ -9,7 +9,8 @@ export enum Module {
   DOCUMENT = 'DOCUMENT',
   OTHER = 'OTHER',
   MEMO = 'MEMO',
-  KNOWLEDGE_BASE = 'KNOWLEDGE_BASE'
+  KNOWLEDGE_BASE = 'KNOWLEDGE_BASE',
+  TRAINING = 'TRAINING'
 }
 
 @Entity('uploads')

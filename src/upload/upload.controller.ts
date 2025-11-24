@@ -29,7 +29,7 @@ export class UploadController {
         },
         module: {
           type: 'string',
-          enum: ['ACTIVITY', 'MEMO', 'KNOWLEDGE_BASE', 'PLAN', 'DOCUMENT', 'OTHER'],
+          enum: ['ACTIVITY', 'MEMO', 'KNOWLEDGE_BASE', 'PLAN', 'DOCUMENT', 'OTHER', 'TRAINING'],
         },
         requires_approval: {
           type: 'any',
