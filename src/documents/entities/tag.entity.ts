@@ -9,6 +9,6 @@ export class Tag extends BaseEntity {
   @Column({ unique: true })
   name: string;
 
-  @ManyToMany(() => Document, document => document.tags)
+  @ManyToMany(() => Document, (document) => document.tags)
   documents: Document[];
-} 
+}

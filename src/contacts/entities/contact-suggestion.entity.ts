@@ -7,13 +7,13 @@ import { User } from '../../users/entities/user.entity';
 export enum SuggestionStatus {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED'
+  REJECTED = 'REJECTED',
 }
 
 export enum SuggestionType {
   UPDATE = 'UPDATE',
   DELETE = 'DELETE',
-  ADD = 'ADD'
+  ADD = 'ADD',
 }
 
 @Entity('contact_suggestions')
@@ -37,7 +37,7 @@ export class ContactSuggestion extends BaseEntity {
   @ApiProperty({ enum: SuggestionType, example: SuggestionType.UPDATE })
   @Column({
     type: 'enum',
-    enum: SuggestionType
+    enum: SuggestionType,
   })
   suggestionType: SuggestionType;
 
@@ -45,7 +45,7 @@ export class ContactSuggestion extends BaseEntity {
   @Column({
     type: 'enum',
     enum: SuggestionStatus,
-    default: SuggestionStatus.PENDING
+    default: SuggestionStatus.PENDING,
   })
   status: SuggestionStatus;
 
@@ -53,9 +53,10 @@ export class ContactSuggestion extends BaseEntity {
   @Column()
   reason: string;
 
-  @ApiProperty({ 
-    example: '{"phoneNumber": "+251922334455", "emailAddress": "new.email@moh.gov.et"}',
-    description: 'JSON object containing the suggested changes'
+  @ApiProperty({
+    example:
+      '{"phoneNumber": "+251922334455", "emailAddress": "new.email@moh.gov.et"}',
+    description: 'JSON object containing the suggested changes',
   })
   @Column({ type: 'json', nullable: true })
   suggestedChanges?: object;
@@ -75,4 +76,4 @@ export class ContactSuggestion extends BaseEntity {
   @ApiProperty({ example: 'Changes approved and applied', required: false })
   @Column({ type: 'text', nullable: true })
   reviewNotes?: string;
-} 
+}

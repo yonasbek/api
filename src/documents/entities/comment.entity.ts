@@ -10,9 +10,9 @@ export class Comment extends BaseEntity {
   @Column('text')
   message: string;
 
-  @ManyToOne(() => Document, document => document.comments)
+  @ManyToOne(() => Document, (document) => document.comments)
   document: Document;
 
   @ManyToOne(() => User)
   user: User;
-} 
+}

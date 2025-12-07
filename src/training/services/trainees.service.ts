@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Trainee } from '../entities/trainee.entity';
@@ -15,11 +19,13 @@ export class TraineesService {
   async create(createTraineeDto: CreateTraineeDto): Promise<Trainee> {
     // Check if email already exists
     const existingTrainee = await this.traineeRepository.findOne({
-      where: { email: createTraineeDto.email }
+      where: { email: createTraineeDto.email },
     });
 
     if (existingTrainee) {
-      throw new BadRequestException(`Trainee with email ${createTraineeDto.email} already exists`);
+      throw new BadRequestException(
+        `Trainee with email ${createTraineeDto.email} already exists`,
+      );
     }
 
     const trainee = this.traineeRepository.create(createTraineeDto);
@@ -29,14 +35,14 @@ export class TraineesService {
   async findAll(): Promise<Trainee[]> {
     return await this.traineeRepository.find({
       relations: ['enrollments', 'enrollments.course'],
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     });
   }
 
   async findOne(id: string): Promise<Trainee> {
     const trainee = await this.traineeRepository.findOne({
       where: { id },
-      relations: ['enrollments', 'enrollments.course']
+      relations: ['enrollments', 'enrollments.course'],
     });
 
     if (!trainee) {
@@ -46,17 +52,22 @@ export class TraineesService {
     return trainee;
   }
 
-  async update(id: string, updateTraineeDto: UpdateTraineeDto): Promise<Trainee> {
+  async update(
+    id: string,
+    updateTraineeDto: UpdateTraineeDto,
+  ): Promise<Trainee> {
     const trainee = await this.findOne(id);
 
     // Check if email is being changed and if it already exists
     if (updateTraineeDto.email && updateTraineeDto.email !== trainee.email) {
       const existingTrainee = await this.traineeRepository.findOne({
-        where: { email: updateTraineeDto.email }
+        where: { email: updateTraineeDto.email },
       });
 
       if (existingTrainee) {
-        throw new BadRequestException(`Trainee with email ${updateTraineeDto.email} already exists`);
+        throw new BadRequestException(
+          `Trainee with email ${updateTraineeDto.email} already exists`,
+        );
       }
     }
 
@@ -69,12 +80,13 @@ export class TraineesService {
 
     // Check if trainee has enrollments
     if (trainee.enrollments && trainee.enrollments.length > 0) {
-      throw new BadRequestException('Cannot delete trainee with existing enrollments');
+      throw new BadRequestException(
+        'Cannot delete trainee with existing enrollments',
+      );
     }
 
     await this.traineeRepository.remove(trainee);
   }
-
 
   async getTraineeStats(id: string): Promise<{
     total_enrollments: number;
@@ -85,13 +97,17 @@ export class TraineesService {
     const enrollments = trainee.enrollments || [];
 
     const total_enrollments = enrollments.length;
-    const completed_courses = enrollments.filter(e => e.status === 'completed').length;
-    const in_progress_courses = enrollments.filter(e => e.status === 'in_progress').length;
+    const completed_courses = enrollments.filter(
+      (e) => e.status === 'completed',
+    ).length;
+    const in_progress_courses = enrollments.filter(
+      (e) => e.status === 'in_progress',
+    ).length;
 
     return {
       total_enrollments,
       completed_courses,
-      in_progress_courses
+      in_progress_courses,
     };
   }
 
@@ -101,10 +117,9 @@ export class TraineesService {
       .leftJoinAndSelect('trainee.enrollments', 'enrollments')
       .leftJoinAndSelect('enrollments.course', 'course')
       .where('trainee.name ILIKE :query OR trainee.email ILIKE :query', {
-        query: `%${query}%`
+        query: `%${query}%`,
       })
       .orderBy('trainee.createdAt', 'DESC')
       .getMany();
   }
 }
-

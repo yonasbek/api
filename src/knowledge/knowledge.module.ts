@@ -7,11 +7,9 @@ import { Category } from './entities/category.entity';
 import { Tag } from './entities/tag.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Article, Category, Tag]),
-  ],
+  imports: [TypeOrmModule.forFeature([Article, Category, Tag])],
   controllers: [KnowledgeController],
   providers: [KnowledgeService],
   exports: [KnowledgeService],
-}) 
+})
 export class KnowledgeModule {}

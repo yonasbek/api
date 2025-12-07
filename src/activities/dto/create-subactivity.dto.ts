@@ -1,4 +1,12 @@
-import { IsString, IsNotEmpty, IsDate, IsEnum, IsNumber, IsUUID, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsDate,
+  IsEnum,
+  IsNumber,
+  IsUUID,
+  IsOptional,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { ActivityStatus } from '../entities/activity.entity';
@@ -9,7 +17,9 @@ export class CreateSubActivityDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ example: 'Create and configure the database tables and relationships' })
+  @ApiProperty({
+    example: 'Create and configure the database tables and relationships',
+  })
   @IsString()
   @IsOptional()
   description?: string;
@@ -52,9 +62,9 @@ export class CreateSubActivityDto {
   @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
   @IsUUID()
   activity_id: string;
-  
+
   @ApiProperty({ example: 1 })
   @IsNumber()
   @IsOptional()
   weight?: number;
-} 
+}

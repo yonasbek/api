@@ -1,4 +1,13 @@
-import { IsString, IsNotEmpty, IsDate, IsEnum, IsNumber, IsUUID, IsOptional, IsArray } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsDate,
+  IsEnum,
+  IsNumber,
+  IsUUID,
+  IsOptional,
+  IsArray,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { ActivityStatus, PlanType } from '../entities/activity.entity';
@@ -19,7 +28,9 @@ export class CreateActivityDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ example: 'Improve patient experience and reduce waiting times' })
+  @ApiProperty({
+    example: 'Improve patient experience and reduce waiting times',
+  })
   @IsString()
   @IsNotEmpty()
   strategic_objective: string;
@@ -44,7 +55,7 @@ export class CreateActivityDto {
   @IsDate()
   end_date: Date;
 
-  @ApiProperty({ example: 50000.00 })
+  @ApiProperty({ example: 50000.0 })
   @IsNumber()
   budget_allocated: number;
 
@@ -71,4 +82,4 @@ export class CreateActivityDto {
   @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
   @IsUUID()
   plan_id: string;
-} 
+}

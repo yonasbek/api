@@ -39,7 +39,10 @@ export class IndicatorsService {
     return indicator;
   }
 
-  async update(id: string, updateIndicatorDto: UpdateIndicatorDto): Promise<Indicator> {
+  async update(
+    id: string,
+    updateIndicatorDto: UpdateIndicatorDto,
+  ): Promise<Indicator> {
     const indicator = await this.findOne(id);
     Object.assign(indicator, updateIndicatorDto);
     return await this.indicatorRepository.save(indicator);
@@ -70,11 +73,15 @@ export class IndicatorsService {
   }> {
     const indicators = await this.findAll();
     const total_indicators = indicators.length;
-    const meeting_target = indicators.filter(i => i.current_value >= i.target_value).length;
+    const meeting_target = indicators.filter(
+      (i) => i.current_value >= i.target_value,
+    ).length;
     const below_target = total_indicators - meeting_target;
 
-    const by_category: { [key: string]: { total: number; meeting_target: number } } = {};
-    indicators.forEach(indicator => {
+    const by_category: {
+      [key: string]: { total: number; meeting_target: number };
+    } = {};
+    indicators.forEach((indicator) => {
       if (!by_category[indicator.category]) {
         by_category[indicator.category] = { total: 0, meeting_target: 0 };
       }
@@ -92,13 +99,20 @@ export class IndicatorsService {
     };
   }
 
-  async getHistoricalTrend(id: string, startDate: Date, endDate: Date): Promise<any[]> {
+  async getHistoricalTrend(
+    id: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<any[]> {
     const indicator = await this.findOne(id);
     return await this.indicatorRepository
       .createQueryBuilder('indicator')
       .leftJoinAndSelect('indicator.historical_data', 'historical_data')
-      .where('historical_data.date BETWEEN :startDate AND :endDate', { startDate, endDate })
+      .where('historical_data.date BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      })
       .orderBy('historical_data.date', 'ASC')
       .getMany();
   }
-} 
+}

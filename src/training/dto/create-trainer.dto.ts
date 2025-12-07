@@ -6,16 +6,25 @@ export class CreateTrainerDto {
   @IsString()
   name: string;
 
-  @ApiPropertyOptional({ description: 'Phone number of the trainer', example: '+1234567890' })
+  @ApiPropertyOptional({
+    description: 'Phone number of the trainer',
+    example: '+1234567890',
+  })
   @IsOptional()
   @IsString()
   phone?: string;
 
-  @ApiProperty({ description: 'Email address of the trainer', example: 'john.doe@example.com' })
+  @ApiProperty({
+    description: 'Email address of the trainer',
+    example: 'john.doe@example.com',
+  })
   @IsEmail()
   email: string;
 
-  @ApiPropertyOptional({ description: 'Whether the trainer is active', default: true })
+  @ApiPropertyOptional({
+    description: 'Whether the trainer is active',
+    default: true,
+  })
   @IsOptional()
   @IsBoolean()
   is_active?: boolean;

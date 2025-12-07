@@ -1,4 +1,16 @@
-import { IsString, IsNotEmpty, IsDateString, IsUUID, IsOptional, IsBoolean, ValidateNested, IsArray, IsNumber, IsEmail, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsDateString,
+  IsUUID,
+  IsOptional,
+  IsBoolean,
+  ValidateNested,
+  IsArray,
+  IsNumber,
+  IsEmail,
+  IsEnum,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { AttendeeStatus } from '../entities/booking.entity';
@@ -103,4 +115,4 @@ export class CreateBookingDto {
   @IsArray()
   @IsOptional()
   resources?: ResourceDto[];
-} 
+}

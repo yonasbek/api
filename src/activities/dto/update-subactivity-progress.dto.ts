@@ -1,4 +1,11 @@
-import { IsNumber, IsString, IsOptional, IsEnum, Min, Max } from 'class-validator';
+import {
+  IsNumber,
+  IsString,
+  IsOptional,
+  IsEnum,
+  Min,
+  Max,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ActivityStatus } from '../entities/activity.entity';
 
@@ -18,4 +25,4 @@ export class UpdateSubActivityProgressDto {
   @IsString()
   @IsOptional()
   notes?: string;
-} 
+}

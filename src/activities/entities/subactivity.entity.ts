@@ -5,11 +5,11 @@ import { User } from '../../users/entities/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum ActivityStatus {
-    NOT_STARTED = 'NOT_STARTED',
-    IN_PROGRESS = 'IN_PROGRESS',
-    COMPLETED = 'COMPLETED',
-    DELAYED = 'DELAYED'
-  }
+  NOT_STARTED = 'NOT_STARTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  DELAYED = 'DELAYED',
+}
 
 @Entity('subactivities')
 export class SubActivity extends BaseEntity {
@@ -17,7 +17,9 @@ export class SubActivity extends BaseEntity {
   @Column()
   title: string;
 
-  @ApiProperty({ example: 'Create and configure the database tables and relationships' })
+  @ApiProperty({
+    example: 'Create and configure the database tables and relationships',
+  })
   @Column('text', { nullable: true })
   description: string;
 
@@ -37,11 +39,11 @@ export class SubActivity extends BaseEntity {
   @Column('date')
   end_date: Date;
 
-  @ApiProperty({ enum: ActivityStatus})
+  @ApiProperty({ enum: ActivityStatus })
   @Column({
     type: 'enum',
     enum: ActivityStatus,
-    default: ActivityStatus.NOT_STARTED
+    default: ActivityStatus.NOT_STARTED,
   })
   status: ActivityStatus;
 
@@ -57,7 +59,7 @@ export class SubActivity extends BaseEntity {
   @Column({ default: 'Medium' })
   priority: string;
 
-  @ManyToOne(() => Activity, activity => activity.subactivities)
+  @ManyToOne(() => Activity, (activity) => activity.subactivities)
   @JoinColumn({ name: 'activity_id' })
   activity: Activity;
 
@@ -66,4 +68,4 @@ export class SubActivity extends BaseEntity {
 
   @Column({ nullable: true })
   weight?: number;
-} 
+}

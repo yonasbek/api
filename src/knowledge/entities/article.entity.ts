@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, JoinTable, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  ManyToMany,
+  JoinTable,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Category } from './category.entity';
 import { Tag } from './tag.entity';
 import { User } from '../../users/entities/user.entity';
@@ -23,17 +32,17 @@ export class Article {
   @Column()
   authorId: string;
 
-  @ManyToOne(() => Category, category => category.articles, { eager: true })
+  @ManyToOne(() => Category, (category) => category.articles, { eager: true })
   category: Category;
 
   @Column()
   categoryId: string;
 
-  @ManyToMany(() => Tag, tag => tag.articles, { eager: true })
+  @ManyToMany(() => Tag, (tag) => tag.articles, { eager: true })
   @JoinTable({
     name: 'article_tags',
     joinColumn: { name: 'article_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' }
+    inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' },
   })
   tags: Tag[];
 
@@ -48,4 +57,4 @@ export class Article {
 
   @UpdateDateColumn()
   updatedAt: Date;
-} 
+}

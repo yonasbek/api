@@ -10,7 +10,7 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/',
   });
-  
+
   // Enable CORS with explicit configuration
   app.enableCors({
     origin: '*',
@@ -19,7 +19,7 @@ async function bootstrap() {
     exposedHeaders: '*',
     credentials: true,
     preflightContinue: false,
-    optionsSuccessStatus: 204
+    optionsSuccessStatus: 204,
   });
 
   // Enable validation pipes
@@ -32,10 +32,10 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
   await app.listen(3000);
 }
-bootstrap(); 
+bootstrap();

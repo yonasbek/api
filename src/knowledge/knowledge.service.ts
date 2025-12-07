@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { Article } from './entities/article.entity';
@@ -25,13 +29,15 @@ export class KnowledgeService {
   // Article operations
   async createArticle(createArticleDto: CreateArticleDto): Promise<Article> {
     const article = this.articleRepository.create(createArticleDto);
-    
+
     // Verify category exists
     const category = await this.categoryRepository.findOne({
-      where: { id: createArticleDto.categoryId }
+      where: { id: createArticleDto.categoryId },
     });
     if (!category) {
-      throw new NotFoundException(`Category with ID ${createArticleDto.categoryId} not found`);
+      throw new NotFoundException(
+        `Category with ID ${createArticleDto.categoryId} not found`,
+      );
     }
 
     // Verify tags exist if provided
@@ -44,7 +50,7 @@ export class KnowledgeService {
     }
 
     const savedArticle = await this.articleRepository.save(article);
-    
+
     // Update category article count
     category.articleCount++;
     await this.categoryRepository.save(category);
@@ -80,21 +86,29 @@ export class KnowledgeService {
     return article;
   }
 
-  async updateArticle(id: string, updateArticleDto: UpdateArticleDto): Promise<Article> {
+  async updateArticle(
+    id: string,
+    updateArticleDto: UpdateArticleDto,
+  ): Promise<Article> {
     const article = await this.findOneArticle(id);
-    
+
     // Handle category change
-    if (updateArticleDto.categoryId && updateArticleDto.categoryId !== article.categoryId) {
+    if (
+      updateArticleDto.categoryId &&
+      updateArticleDto.categoryId !== article.categoryId
+    ) {
       const newCategory = await this.categoryRepository.findOne({
-        where: { id: updateArticleDto.categoryId }
+        where: { id: updateArticleDto.categoryId },
       });
       if (!newCategory) {
-        throw new NotFoundException(`Category with ID ${updateArticleDto.categoryId} not found`);
+        throw new NotFoundException(
+          `Category with ID ${updateArticleDto.categoryId} not found`,
+        );
       }
-      
+
       // Update category counts
       const oldCategory = await this.categoryRepository.findOne({
-        where: { id: article.categoryId }
+        where: { id: article.categoryId },
       });
       if (oldCategory) {
         oldCategory.articleCount--;
@@ -106,7 +120,9 @@ export class KnowledgeService {
 
     // Handle tags change
     if (updateArticleDto.tagIds) {
-      const newTags = await this.tagRepository.findByIds(updateArticleDto.tagIds);
+      const newTags = await this.tagRepository.findByIds(
+        updateArticleDto.tagIds,
+      );
       if (newTags.length !== updateArticleDto.tagIds.length) {
         throw new BadRequestException('One or more tags not found');
       }
@@ -119,7 +135,7 @@ export class KnowledgeService {
         }
       }
       for (const newTag of newTags) {
-        if (!article.tags.map(t => t.id).includes(newTag.id)) {
+        if (!article.tags.map((t) => t.id).includes(newTag.id)) {
           newTag.articleCount++;
           await this.tagRepository.save(newTag);
         }
@@ -136,7 +152,7 @@ export class KnowledgeService {
 
     // Update category count
     const category = await this.categoryRepository.findOne({
-      where: { id: article.categoryId }
+      where: { id: article.categoryId },
     });
     if (category) {
       category.articleCount--;
@@ -156,7 +172,9 @@ export class KnowledgeService {
   }
 
   // Category operations
-  async createCategory(createCategoryDto: CreateCategoryDto): Promise<Category> {
+  async createCategory(
+    createCategoryDto: CreateCategoryDto,
+  ): Promise<Category> {
     const category = this.categoryRepository.create(createCategoryDto);
     return await this.categoryRepository.save(category);
   }
@@ -181,7 +199,10 @@ export class KnowledgeService {
     return category;
   }
 
-  async updateCategory(id: string, updateCategoryDto: UpdateCategoryDto): Promise<Category> {
+  async updateCategory(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<Category> {
     const category = await this.findOneCategory(id);
     Object.assign(category, updateCategoryDto);
     return await this.categoryRepository.save(category);
@@ -190,9 +211,11 @@ export class KnowledgeService {
   async removeCategory(id: string): Promise<void> {
     const category = await this.findOneCategory(id);
     if (category.articleCount > 0) {
-      throw new BadRequestException('Cannot delete category with existing articles');
+      throw new BadRequestException(
+        'Cannot delete category with existing articles',
+      );
     }
-    
+
     const result = await this.categoryRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Category with ID ${id} not found`);
@@ -236,7 +259,7 @@ export class KnowledgeService {
     if (tag.articleCount > 0) {
       throw new BadRequestException('Cannot delete tag with existing articles');
     }
-    
+
     const result = await this.tagRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Tag with ID ${id} not found`);
@@ -273,4 +296,4 @@ export class KnowledgeService {
     const tag = await this.findOneTag(tagId);
     return tag.articles;
   }
-} 
+}

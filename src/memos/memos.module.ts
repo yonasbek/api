@@ -14,4 +14,4 @@ import { Uploads } from '../upload/upload.entity';
   providers: [MemosService, UploadService, DocumentGenerationService],
   exports: [MemosService],
 })
-export class MemosModule {} 
+export class MemosModule {}

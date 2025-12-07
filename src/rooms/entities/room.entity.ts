@@ -6,7 +6,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export enum RoomStatus {
   AVAILABLE = 'available',
   OCCUPIED = 'occupied',
-  MAINTENANCE = 'maintenance'
+  MAINTENANCE = 'maintenance',
 }
 
 @Entity('rooms')
@@ -27,7 +27,7 @@ export class Room extends BaseEntity {
   @Column({
     type: 'enum',
     enum: RoomStatus,
-    default: RoomStatus.AVAILABLE
+    default: RoomStatus.AVAILABLE,
   })
   status: RoomStatus;
 
@@ -38,10 +38,10 @@ export class Room extends BaseEntity {
       properties: {
         id: { type: 'string' },
         name: { type: 'string' },
-        icon: { type: 'string' }
-      }
+        icon: { type: 'string' },
+      },
     },
-    example: [{ id: '1', name: 'Projector', icon: 'projector' }]
+    example: [{ id: '1', name: 'Projector', icon: 'projector' }],
   })
   @Column('jsonb', { default: [] })
   facilities: Array<{
@@ -58,6 +58,6 @@ export class Room extends BaseEntity {
   @Column('text', { nullable: true })
   image: string;
 
-  @OneToMany(() => Booking, booking => booking.room)
+  @OneToMany(() => Booking, (booking) => booking.room)
   bookings: Booking[];
-} 
+}

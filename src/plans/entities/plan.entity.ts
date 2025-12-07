@@ -8,7 +8,7 @@ export enum PlanType {
   ECCD = 'ECCD',
   HDD = 'HDD',
   SRD = 'SRD',
-  LEO = 'LEO'
+  LEO = 'LEO',
 }
 
 @Entity('plans')
@@ -29,26 +29,30 @@ export class Plan extends BaseEntity {
   @Column({
     type: 'enum',
     enum: PlanType,
-    default: PlanType.PFRD
+    default: PlanType.PFRD,
   })
   plan_type: PlanType;
 
   @ApiProperty({ example: 'draft' })
-  @Column({default: 'draft'})
+  @Column({ default: 'draft' })
   status: string;
 
   @ApiProperty({ example: '10000' })
-  @Column({default: 0})
+  @Column({ default: 0 })
   budget_allocated: number;
 
   @ApiProperty({ example: '10000' })
-  @Column({default: 0})
+  @Column({ default: 0 })
   budget_spent: number;
 
-  @ApiProperty({ example: 0, description: 'Overall progress percentage (0-100). Calculated from activities progress.' })
+  @ApiProperty({
+    example: 0,
+    description:
+      'Overall progress percentage (0-100). Calculated from activities progress.',
+  })
   @Column('int', { default: 0 })
   progress: number;
 
-  @OneToMany(() => Activity, activity => activity.plan)
+  @OneToMany(() => Activity, (activity) => activity.plan)
   activities: Activity[];
-} 
+}

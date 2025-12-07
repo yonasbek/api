@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Course } from '../entities/course.entity';
@@ -24,14 +28,14 @@ export class CoursesService {
   async findAll(): Promise<Course[]> {
     return await this.courseRepository.find({
       relations: ['trainers', 'enrollments'],
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     });
   }
 
   async findOne(id: string): Promise<Course> {
     const course = await this.courseRepository.findOne({
       where: { id },
-      relations: ['trainers', 'enrollments', 'enrollments.trainee']
+      relations: ['trainers', 'enrollments', 'enrollments.trainee'],
     });
 
     if (!course) {
@@ -52,19 +56,20 @@ export class CoursesService {
 
     // Check if course has enrollments
     if (course.enrollments && course.enrollments.length > 0) {
-      throw new BadRequestException('Cannot delete course with existing enrollments');
+      throw new BadRequestException(
+        'Cannot delete course with existing enrollments',
+      );
     }
 
     await this.courseRepository.remove(course);
   }
-
 
   async assignTrainers(assignTrainerDto: AssignTrainerDto): Promise<Course> {
     const course = await this.findOne(assignTrainerDto.course_id);
 
     // Find trainers
     const trainers = await this.trainerRepository.find({
-      where: { id: In(assignTrainerDto.trainer_ids) }
+      where: { id: In(assignTrainerDto.trainer_ids) },
     });
 
     if (trainers.length !== assignTrainerDto.trainer_ids.length) {
@@ -72,7 +77,7 @@ export class CoursesService {
     }
 
     // Check if trainers are active
-    const inactiveTrainers = trainers.filter(trainer => !trainer.is_active);
+    const inactiveTrainers = trainers.filter((trainer) => !trainer.is_active);
     if (inactiveTrainers.length > 0) {
       throw new BadRequestException('Cannot assign inactive trainers');
     }
@@ -84,7 +89,9 @@ export class CoursesService {
   async removeTrainer(courseId: string, trainerId: string): Promise<Course> {
     const course = await this.findOne(courseId);
 
-    course.trainers = course.trainers.filter(trainer => trainer.id !== trainerId);
+    course.trainers = course.trainers.filter(
+      (trainer) => trainer.id !== trainerId,
+    );
     return await this.courseRepository.save(course);
   }
 
@@ -100,14 +107,25 @@ export class CoursesService {
     const enrollments = course.enrollments || [];
 
     const total_enrollments = enrollments.length;
-    const completed_enrollments = enrollments.filter(e => e.status === 'completed').length;
-    const in_progress_enrollments = enrollments.filter(e => e.status === 'in_progress').length;
-    const pending_enrollments = enrollments.filter(e => e.status === 'pending').length;
+    const completed_enrollments = enrollments.filter(
+      (e) => e.status === 'completed',
+    ).length;
+    const in_progress_enrollments = enrollments.filter(
+      (e) => e.status === 'in_progress',
+    ).length;
+    const pending_enrollments = enrollments.filter(
+      (e) => e.status === 'pending',
+    ).length;
 
-    const completion_rate = total_enrollments > 0 ? (completed_enrollments / total_enrollments) * 100 : 0;
-    const average_progress = total_enrollments > 0 
-      ? enrollments.reduce((sum, e) => sum + e.progress_percentage, 0) / total_enrollments 
-      : 0;
+    const completion_rate =
+      total_enrollments > 0
+        ? (completed_enrollments / total_enrollments) * 100
+        : 0;
+    const average_progress =
+      total_enrollments > 0
+        ? enrollments.reduce((sum, e) => sum + e.progress_percentage, 0) /
+          total_enrollments
+        : 0;
 
     return {
       total_enrollments,
@@ -115,7 +133,7 @@ export class CoursesService {
       in_progress_enrollments,
       pending_enrollments,
       completion_rate,
-      average_progress
+      average_progress,
     };
   }
 
@@ -124,11 +142,13 @@ export class CoursesService {
       .createQueryBuilder('course')
       .leftJoinAndSelect('course.trainers', 'trainers')
       .leftJoinAndSelect('course.enrollments', 'enrollments')
-      .where('course.title ILIKE :query OR course.description ILIKE :query OR course.code ILIKE :query', {
-        query: `%${query}%`
-      })
+      .where(
+        'course.title ILIKE :query OR course.description ILIKE :query OR course.code ILIKE :query',
+        {
+          query: `%${query}%`,
+        },
+      )
       .orderBy('course.createdAt', 'DESC')
       .getMany();
   }
 }
-

@@ -16,7 +16,7 @@ export class ActivityComment extends BaseEntity {
   @Column()
   activity_id: string;
 
-  @ManyToOne(() => Activity, activity => activity.comments)
+  @ManyToOne(() => Activity, (activity) => activity.comments)
   @JoinColumn({ name: 'activity_id' })
   activity: Activity;
-} 
+}

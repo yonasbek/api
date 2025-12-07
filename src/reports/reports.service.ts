@@ -28,13 +28,13 @@ export class ReportsService {
     const totalUsers = await this.userRepository.count();
     const totalRooms = await this.roomRepository.count();
     const totalBookings = await this.bookingRepository.count();
-    
+
     // Get upcoming meetings this week
     const startOfWeek = new Date();
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 7);
-    
+
     const upcomingMeetings = await this.bookingRepository.count({
       where: {
         start_time: Between(startOfWeek, endOfWeek),
@@ -64,7 +64,7 @@ export class ReportsService {
       attendanceToday: 85.5, // Dummy data - would come from attendance module
       documentsUploadedThisMonth: documentsUploadedThisMonth || 142, // Real data with fallback
       tasksDueThisWeek: 8, // Dummy data - would come from tasks module
-      
+
       // Real data
       totalUsers,
       totalRooms,
@@ -81,45 +81,47 @@ export class ReportsService {
       });
 
       if (memos.length > 0) {
-        return memos.map(memo => ({
+        return memos.map((memo) => ({
           title: memo.title,
           type: memo.memo_type,
           issuedBy: memo.department,
           dateIssued: memo.date_of_issue.toISOString().split('T')[0],
-          recipients: memo.recipients?.map(r => r.fullName || r.firstName + ' ' + r.lastName).filter(Boolean) || ['All Staff'],
-          status: memo.status
+          recipients: memo.recipients
+            ?.map((r) => r.fullName || r.firstName + ' ' + r.lastName)
+            .filter(Boolean) || ['All Staff'],
+          status: memo.status,
         }));
       }
     } catch (error) {
       console.log('Error fetching memos, using dummy data:', error);
     }
-    
+
     // Fallback dummy data
     return [
       {
-        title: "Q4 Budget Review",
-        type: "GENERAL",
-        issuedBy: "Finance Department",
-        dateIssued: "2024-01-15",
-        recipients: ["All Staff"],
-        status: "APPROVED"
+        title: 'Q4 Budget Review',
+        type: 'GENERAL',
+        issuedBy: 'Finance Department',
+        dateIssued: '2024-01-15',
+        recipients: ['All Staff'],
+        status: 'APPROVED',
       },
       {
-        title: "New Security Protocols",
-        type: "INSTRUCTIONAL",
-        issuedBy: "IT Department", 
-        dateIssued: "2024-01-12",
-        recipients: ["All Staff"],
-        status: "APPROVED"
+        title: 'New Security Protocols',
+        type: 'INSTRUCTIONAL',
+        issuedBy: 'IT Department',
+        dateIssued: '2024-01-12',
+        recipients: ['All Staff'],
+        status: 'APPROVED',
       },
       {
-        title: "Holiday Schedule Update",
-        type: "INFORMATIONAL",
-        issuedBy: "Human Resources",
-        dateIssued: "2024-01-10",
-        recipients: ["All Staff"],
-        status: "APPROVED"
-      }
+        title: 'Holiday Schedule Update',
+        type: 'INFORMATIONAL',
+        issuedBy: 'Human Resources',
+        dateIssued: '2024-01-10',
+        recipients: ['All Staff'],
+        status: 'APPROVED',
+      },
     ];
   }
 
@@ -130,13 +132,16 @@ export class ReportsService {
       take: 10,
     });
 
-    return bookings.map(booking => ({
+    return bookings.map((booking) => ({
       room: booking.room?.name || 'Unknown Room',
       date: booking.start_time.toISOString().split('T')[0],
       time: `${booking.start_time.toLocaleTimeString()} - ${booking.end_time.toLocaleTimeString()}`,
-      bookedBy: booking.attendees?.length > 0 ? booking.attendees[0].name : 'Unknown User',
+      bookedBy:
+        booking.attendees?.length > 0
+          ? booking.attendees[0].name
+          : 'Unknown User',
       meetingTitle: booking.title,
-      status: new Date() > booking.end_time ? 'Completed' : 'Scheduled'
+      status: new Date() > booking.end_time ? 'Completed' : 'Scheduled',
     }));
   }
 
@@ -149,12 +154,15 @@ export class ReportsService {
       });
 
       if (documents.length > 0) {
-        return documents.map(doc => ({
+        return documents.map((doc) => ({
           title: doc.title,
-          uploadedBy: doc.uploadedBy?.fullName || doc.uploadedBy?.firstName + ' ' + doc.uploadedBy?.lastName || 'Unknown User',
+          uploadedBy:
+            doc.uploadedBy?.fullName ||
+            doc.uploadedBy?.firstName + ' ' + doc.uploadedBy?.lastName ||
+            'Unknown User',
           date: doc.createdAt.toISOString().split('T')[0],
           category: doc.category,
-          downloads: Math.floor(Math.random() * 100) + 1 // Random downloads since we don't track this
+          downloads: Math.floor(Math.random() * 100) + 1, // Random downloads since we don't track this
         }));
       }
     } catch (error) {
@@ -164,26 +172,26 @@ export class ReportsService {
     // Fallback dummy data
     return [
       {
-        title: "Employee Handbook 2024",
-        uploadedBy: "HR Department",
-        date: "2024-01-15",
-        category: "HR",
-        downloads: 45
+        title: 'Employee Handbook 2024',
+        uploadedBy: 'HR Department',
+        date: '2024-01-15',
+        category: 'HR',
+        downloads: 45,
       },
       {
-        title: "Security Guidelines",
-        uploadedBy: "IT Department",
-        date: "2024-01-12", 
-        category: "IT",
-        downloads: 32
+        title: 'Security Guidelines',
+        uploadedBy: 'IT Department',
+        date: '2024-01-12',
+        category: 'IT',
+        downloads: 32,
       },
       {
-        title: "Budget Report Q4",
-        uploadedBy: "Finance Team",
-        date: "2024-01-10",
-        category: "Finance",
-        downloads: 28
-      }
+        title: 'Budget Report Q4',
+        uploadedBy: 'Finance Team',
+        date: '2024-01-10',
+        category: 'Finance',
+        downloads: 28,
+      },
     ];
   }
 
@@ -191,37 +199,43 @@ export class ReportsService {
     // Dummy data for task tracking
     return [
       {
-        title: "Update website content",
-        assignedTo: "Marketing Team",
-        dueDate: "2024-01-20",
+        title: 'Update website content',
+        assignedTo: 'Marketing Team',
+        dueDate: '2024-01-20',
         progress: 75,
-        status: "In Progress"
+        status: 'In Progress',
       },
       {
-        title: "Quarterly review preparation",
-        assignedTo: "Management",
-        dueDate: "2024-01-18",
+        title: 'Quarterly review preparation',
+        assignedTo: 'Management',
+        dueDate: '2024-01-18',
         progress: 50,
-        status: "In Progress"
+        status: 'In Progress',
       },
       {
-        title: "Server maintenance",
-        assignedTo: "IT Department",
-        dueDate: "2024-01-22",
+        title: 'Server maintenance',
+        assignedTo: 'IT Department',
+        dueDate: '2024-01-22',
         progress: 25,
-        status: "Not Started"
-      }
+        status: 'Not Started',
+      },
     ];
   }
 
   async getAttendanceAnalytics() {
     // Dummy data for attendance analytics
     return {
-      dates: ['2024-01-15', '2024-01-16', '2024-01-17', '2024-01-18', '2024-01-19'],
+      dates: [
+        '2024-01-15',
+        '2024-01-16',
+        '2024-01-17',
+        '2024-01-18',
+        '2024-01-19',
+      ],
       present: [85, 88, 82, 90, 87],
       absent: [10, 8, 12, 6, 9],
       late: [5, 4, 6, 4, 4],
-      wfh: [15, 18, 20, 12, 16]
+      wfh: [15, 18, 20, 12, 16],
     };
   }
-} 
+}

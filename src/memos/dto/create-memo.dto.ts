@@ -1,4 +1,12 @@
-import { IsString, IsNotEmpty, IsUUID, IsEnum, IsArray, IsOptional, IsDate } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsUUID,
+  IsEnum,
+  IsArray,
+  IsOptional,
+  IsDate,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { MemoType, PriorityLevel } from '../entities/memo.entity';
@@ -80,4 +88,4 @@ export class CreateMemoDto {
   @IsString()
   @IsNotEmpty()
   status: MemoStatus;
-} 
+}

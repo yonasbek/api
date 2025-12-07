@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Param, Query, Delete, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -56,4 +65,4 @@ export class UsersController {
   async softDelete(@Param('id') id: string): Promise<void> {
     await this.usersRepository.update(id, { isActive: false });
   }
-} 
+}

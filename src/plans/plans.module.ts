@@ -11,4 +11,4 @@ import { Activity } from '../activities/entities/activity.entity';
   providers: [PlansService],
   exports: [PlansService],
 })
-export class PlansModule {} 
+export class PlansModule {}

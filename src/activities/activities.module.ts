@@ -14,10 +14,17 @@ import { Uploads } from '../upload/upload.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Activity, ActivityComment, ActivityAttachment, SubActivity, User, Uploads]),
+    TypeOrmModule.forFeature([
+      Activity,
+      ActivityComment,
+      ActivityAttachment,
+      SubActivity,
+      User,
+      Uploads,
+    ]),
   ],
   controllers: [ActivitiesController, SubActivitiesController],
   providers: [ActivitiesService, SubActivitiesService, UploadService],
   exports: [ActivitiesService, SubActivitiesService],
 })
-export class ActivitiesModule {} 
+export class ActivitiesModule {}

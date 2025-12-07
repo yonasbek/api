@@ -1,5 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { CoursesService } from '../services/courses.service';
 import { CreateCourseDto } from '../dto/create-course.dto';
 import { UpdateCourseDto } from '../dto/update-course.dto';
@@ -16,7 +32,11 @@ export class CoursesController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new course' })
-  @ApiResponse({ status: 201, description: 'Course created successfully', type: Course })
+  @ApiResponse({
+    status: 201,
+    description: 'Course created successfully',
+    type: Course,
+  })
   @ApiResponse({ status: 400, description: 'Bad request' })
   async create(@Body() createCourseDto: CreateCourseDto): Promise<Course> {
     return await this.coursesService.create(createCourseDto);
@@ -24,11 +44,17 @@ export class CoursesController {
 
   @Get()
   @ApiOperation({ summary: 'Get all courses' })
-  @ApiResponse({ status: 200, description: 'Return all courses', type: [Course] })
-  @ApiQuery({ name: 'search', required: false, description: 'Search courses by title or description' })
-  async findAll(
-    @Query('search') search?: string,
-  ): Promise<Course[]> {
+  @ApiResponse({
+    status: 200,
+    description: 'Return all courses',
+    type: [Course],
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Search courses by title or description',
+  })
+  async findAll(@Query('search') search?: string): Promise<Course[]> {
     if (search) {
       return await this.coursesService.searchCourses(search);
     }
@@ -52,7 +78,11 @@ export class CoursesController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a course' })
-  @ApiResponse({ status: 200, description: 'Course updated successfully', type: Course })
+  @ApiResponse({
+    status: 200,
+    description: 'Course updated successfully',
+    type: Course,
+  })
   @ApiResponse({ status: 404, description: 'Course not found' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   async update(
@@ -66,14 +96,21 @@ export class CoursesController {
   @ApiOperation({ summary: 'Delete a course' })
   @ApiResponse({ status: 200, description: 'Course deleted successfully' })
   @ApiResponse({ status: 404, description: 'Course not found' })
-  @ApiResponse({ status: 400, description: 'Cannot delete course with enrollments' })
+  @ApiResponse({
+    status: 400,
+    description: 'Cannot delete course with enrollments',
+  })
   async remove(@Param('id') id: string): Promise<void> {
     return await this.coursesService.remove(id);
   }
 
   @Post(':id/assign-trainers')
   @ApiOperation({ summary: 'Assign trainers to a course' })
-  @ApiResponse({ status: 200, description: 'Trainers assigned successfully', type: Course })
+  @ApiResponse({
+    status: 200,
+    description: 'Trainers assigned successfully',
+    type: Course,
+  })
   @ApiResponse({ status: 404, description: 'Course not found' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   async assignTrainers(
@@ -86,7 +123,11 @@ export class CoursesController {
 
   @Delete(':courseId/trainers/:trainerId')
   @ApiOperation({ summary: 'Remove a trainer from a course' })
-  @ApiResponse({ status: 200, description: 'Trainer removed successfully', type: Course })
+  @ApiResponse({
+    status: 200,
+    description: 'Trainer removed successfully',
+    type: Course,
+  })
   @ApiResponse({ status: 404, description: 'Course or trainer not found' })
   async removeTrainer(
     @Param('courseId') courseId: string,
@@ -95,4 +136,3 @@ export class CoursesController {
     return await this.coursesService.removeTrainer(courseId, trainerId);
   }
 }
-

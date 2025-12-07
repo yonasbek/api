@@ -22,7 +22,11 @@ export class PlansService {
 
   async findAll(): Promise<Plan[]> {
     const plans = await this.planRepository.find({
-      relations: ['activities', 'activities.subactivities', 'activities.subactivities.user'],
+      relations: [
+        'activities',
+        'activities.subactivities',
+        'activities.subactivities.user',
+      ],
       order: {
         created_at: 'DESC',
       },
@@ -39,14 +43,14 @@ export class PlansService {
   /**
    * Calculate plan progress based on activities' progress
    * Activities' progress is calculated from their subactivities
-   * 
+   *
    * Flow: SubActivities → Activities → Plan
    * - Each activity's progress = average of its subactivities' progress
    * - Plan's progress = average of all activities' calculated progress
    */
   private async calculatePlanProgress(plan: Plan): Promise<void> {
     console.log(`\n=== Calculating progress for plan: ${plan.title} ===`);
-    
+
     if (!plan.activities || plan.activities.length === 0) {
       console.log('No activities found, setting progress to 0');
       (plan as any).calculated_progress = plan.progress || 0;
@@ -59,24 +63,32 @@ export class PlansService {
     plan.activities.forEach((activity, index) => {
       const oldProgress = activity.progress;
       activity.progress = this.calculateActivityProgress(activity);
-      console.log(`Activity ${index + 1}: "${activity.title}" - Progress: ${oldProgress}% → ${activity.progress}%`);
+      console.log(
+        `Activity ${index + 1}: "${activity.title}" - Progress: ${oldProgress}% → ${activity.progress}%`,
+      );
     });
 
     // Step 2: Calculate overall plan progress from activities
     const totalProgress = plan.activities.reduce(
       (sum, activity) => sum + (activity.progress || 0),
-      0
+      0,
     );
 
-    const calculatedProgress = Math.round(totalProgress / plan.activities.length);
-    console.log(`Plan total progress: ${totalProgress}, average: ${calculatedProgress}%`);
+    const calculatedProgress = Math.round(
+      totalProgress / plan.activities.length,
+    );
+    console.log(
+      `Plan total progress: ${totalProgress}, average: ${calculatedProgress}%`,
+    );
 
     // Set both calculated_progress and progress (in-memory only, not persisted)
     (plan as any).calculated_progress = calculatedProgress;
     // Also update the progress field for convenience (won't be persisted to DB)
     plan.progress = calculatedProgress;
-    
-    console.log(`=== Plan "${plan.title}" final progress: ${calculatedProgress}% ===\n`);
+
+    console.log(
+      `=== Plan "${plan.title}" final progress: ${calculatedProgress}% ===\n`,
+    );
   }
 
   /**
@@ -84,29 +96,42 @@ export class PlansService {
    */
   private calculateActivityProgress(activity: Activity): number {
     if (!activity.subactivities || activity.subactivities.length === 0) {
-      console.log(`  No subactivities for "${activity.title}", using stored progress: ${activity.progress || 0}%`);
+      console.log(
+        `  No subactivities for "${activity.title}", using stored progress: ${activity.progress || 0}%`,
+      );
       return activity.progress || 0; // Return stored progress if no subactivities
     }
 
-    console.log(`  Calculating progress for "${activity.title}" from ${activity.subactivities.length} subactivities:`);
-    
-    const subProgresses = activity.subactivities.map(sub => {
+    console.log(
+      `  Calculating progress for "${activity.title}" from ${activity.subactivities.length} subactivities:`,
+    );
+
+    const subProgresses = activity.subactivities.map((sub) => {
       console.log(`    - "${sub.title}": ${sub.progress || 0}%`);
       return sub.progress || 0;
     });
 
-    const totalProgress = subProgresses.reduce((sum, progress) => sum + progress, 0);
-    const averageProgress = Math.round(totalProgress / activity.subactivities.length);
-    
+    const totalProgress = subProgresses.reduce(
+      (sum, progress) => sum + progress,
+      0,
+    );
+    const averageProgress = Math.round(
+      totalProgress / activity.subactivities.length,
+    );
+
     console.log(`  Total: ${totalProgress}, Average: ${averageProgress}%`);
-    
+
     return averageProgress;
   }
 
   async findOne(id: string): Promise<Plan> {
     const plan = await this.planRepository.findOne({
       where: { id },
-      relations: ['activities', 'activities.subactivities', 'activities.subactivities.user'],
+      relations: [
+        'activities',
+        'activities.subactivities',
+        'activities.subactivities.user',
+      ],
     });
 
     if (!plan) {
@@ -135,7 +160,11 @@ export class PlansService {
   async findByFiscalYear(fiscalYear: string): Promise<Plan[]> {
     const plans = await this.planRepository.find({
       where: { fiscal_year: fiscalYear },
-      relations: ['activities', 'activities.subactivities', 'activities.subactivities.user'],
+      relations: [
+        'activities',
+        'activities.subactivities',
+        'activities.subactivities.user',
+      ],
       order: {
         created_at: 'DESC',
       },
@@ -152,7 +181,11 @@ export class PlansService {
   async findByOwner(owner: string): Promise<Plan[]> {
     const plans = await this.planRepository.find({
       where: { owner },
-      relations: ['activities', 'activities.subactivities', 'activities.subactivities.user'],
+      relations: [
+        'activities',
+        'activities.subactivities',
+        'activities.subactivities.user',
+      ],
       order: {
         created_at: 'DESC',
       },
@@ -169,8 +202,12 @@ export class PlansService {
   async findByPlanType(planType: PlanType): Promise<Plan[]> {
     const plans = await this.planRepository.find({
       where: { plan_type: planType },
-      relations: ['activities', 'activities.subactivities', 'activities.subactivities.user'],
-      order: { created_at: 'DESC' }
+      relations: [
+        'activities',
+        'activities.subactivities',
+        'activities.subactivities.user',
+      ],
+      order: { created_at: 'DESC' },
     });
 
     // Calculate progress for each plan based on activities
@@ -181,14 +218,21 @@ export class PlansService {
     return plans;
   }
 
-  async findByPlanTypeAndFiscalYear(planType: PlanType, fiscalYear: string): Promise<Plan[]> {
+  async findByPlanTypeAndFiscalYear(
+    planType: PlanType,
+    fiscalYear: string,
+  ): Promise<Plan[]> {
     const plans = await this.planRepository.find({
-      where: { 
+      where: {
         plan_type: planType,
-        fiscal_year: fiscalYear
+        fiscal_year: fiscalYear,
       },
-      relations: ['activities', 'activities.subactivities', 'activities.subactivities.user'],
-      order: { created_at: 'DESC' }
+      relations: [
+        'activities',
+        'activities.subactivities',
+        'activities.subactivities.user',
+      ],
+      order: { created_at: 'DESC' },
     });
 
     // Calculate progress for each plan based on activities
@@ -215,7 +259,11 @@ export class PlansService {
     }>;
   }> {
     const plans = await this.planRepository.find({
-      relations: ['activities', 'activities.subactivities', 'activities.subactivities.user'],
+      relations: [
+        'activities',
+        'activities.subactivities',
+        'activities.subactivities.user',
+      ],
     });
 
     // Calculate progress for each plan
@@ -227,26 +275,29 @@ export class PlansService {
     const total_plans = plans.length;
     const total_activities = plans.reduce(
       (sum, plan) => sum + (plan.activities?.length || 0),
-      0
+      0,
     );
-    const active_plans = plans.filter(p => p.status === 'active').length;
-    const completed_plans = plans.filter(p => p.status === 'completed').length;
+    const active_plans = plans.filter((p) => p.status === 'active').length;
+    const completed_plans = plans.filter(
+      (p) => p.status === 'completed',
+    ).length;
 
     // Statistics by plan type
     const planTypes = Object.values(PlanType);
-    const by_plan_type = planTypes.map(planType => {
-      const plansOfType = plans.filter(p => p.plan_type === planType);
+    const by_plan_type = planTypes.map((planType) => {
+      const plansOfType = plans.filter((p) => p.plan_type === planType);
       const activitiesOfType = plansOfType.reduce(
         (sum, plan) => sum + (plan.activities?.length || 0),
-        0
+        0,
       );
       const totalProgress = plansOfType.reduce(
         (sum, plan) => sum + (plan.progress || 0),
-        0
+        0,
       );
-      const average_progress = plansOfType.length > 0 
-        ? Math.round(totalProgress / plansOfType.length) 
-        : 0;
+      const average_progress =
+        plansOfType.length > 0
+          ? Math.round(totalProgress / plansOfType.length)
+          : 0;
 
       return {
         plan_type: planType,
@@ -286,7 +337,11 @@ export class PlansService {
   }> {
     const plans = await this.planRepository.find({
       where: { plan_type: planType },
-      relations: ['activities', 'activities.subactivities', 'activities.subactivities.user'],
+      relations: [
+        'activities',
+        'activities.subactivities',
+        'activities.subactivities.user',
+      ],
     });
 
     // Calculate progress for each plan
@@ -297,20 +352,21 @@ export class PlansService {
     const total_plans = plans.length;
     const total_activities = plans.reduce(
       (sum, plan) => sum + (plan.activities?.length || 0),
-      0
+      0,
     );
-    const active_plans = plans.filter(p => p.status === 'active').length;
-    const completed_plans = plans.filter(p => p.status === 'completed').length;
-    
+    const active_plans = plans.filter((p) => p.status === 'active').length;
+    const completed_plans = plans.filter(
+      (p) => p.status === 'completed',
+    ).length;
+
     const totalProgress = plans.reduce(
       (sum, plan) => sum + (plan.progress || 0),
-      0
+      0,
     );
-    const average_progress = plans.length > 0 
-      ? Math.round(totalProgress / plans.length) 
-      : 0;
+    const average_progress =
+      plans.length > 0 ? Math.round(totalProgress / plans.length) : 0;
 
-    const plansSummary = plans.map(plan => ({
+    const plansSummary = plans.map((plan) => ({
       plan_id: plan.id,
       plan_title: plan.title,
       fiscal_year: plan.fiscal_year,
@@ -348,7 +404,7 @@ export class PlansService {
     }>;
   }> {
     const plan = await this.findOne(planId);
-    
+
     if (!plan.activities) {
       return {
         plan_id: plan.id,
@@ -359,11 +415,11 @@ export class PlansService {
       };
     }
 
-    const activities_breakdown = plan.activities.map(activity => {
+    const activities_breakdown = plan.activities.map((activity) => {
       const totalSubactivities = activity.subactivities?.length || 0;
-      const completedSubactivities = activity.subactivities?.filter(
-        sub => sub.progress === 100
-      ).length || 0;
+      const completedSubactivities =
+        activity.subactivities?.filter((sub) => sub.progress === 100).length ||
+        0;
 
       return {
         activity_id: activity.id,
@@ -382,4 +438,4 @@ export class PlansService {
       activities_breakdown,
     };
   }
-} 
+}

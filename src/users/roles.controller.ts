@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from './entities/role.entity';
@@ -47,4 +55,4 @@ export class RolesController {
   async remove(@Param('id') id: string): Promise<void> {
     await this.rolesRepository.delete(id);
   }
-} 
+}

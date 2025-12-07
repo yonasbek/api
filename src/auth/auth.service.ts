@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -13,10 +17,23 @@ export class AuthService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
-  async register(registerDto: RegisterDto): Promise<{ token: string, fullName: string, email: string, role: string }> {
-    const { email, password, fullName, phoneNumber, jobTitle, username, departmentId, roleId, supervisorName, comments } = registerDto;
+  async register(
+    registerDto: RegisterDto,
+  ): Promise<{ token: string; fullName: string; email: string; role: string }> {
+    const {
+      email,
+      password,
+      fullName,
+      phoneNumber,
+      jobTitle,
+      username,
+      departmentId,
+      roleId,
+      supervisorName,
+      comments,
+    } = registerDto;
 
     // Check if user exists
     const userExists = await this.userRepository.findOne({ where: { email } });
@@ -49,10 +66,17 @@ export class AuthService {
       email: user.email,
     });
 
-    return { token, fullName: user.fullName, email: user.email, role: user.jobTitle };
+    return {
+      token,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.jobTitle,
+    };
   }
 
-  async login(loginDto: LoginDto): Promise<{ token: string, fullName: string, email: string, role: string }> {
+  async login(
+    loginDto: LoginDto,
+  ): Promise<{ token: string; fullName: string; email: string; role: string }> {
     const { email, password } = loginDto;
 
     // Find user
@@ -73,6 +97,11 @@ export class AuthService {
       email: user.email,
     });
 
-    return { token, fullName: user.fullName, email: user.email, role: user.jobTitle };
+    return {
+      token,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.jobTitle,
+    };
   }
-} 
+}

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SubActivity } from './entities/subactivity.entity';
@@ -19,23 +23,29 @@ export class SubActivitiesService {
     private userRepository: Repository<User>,
   ) {}
 
-  async create(createSubActivityDto: CreateSubActivityDto): Promise<SubActivity> {
+  async create(
+    createSubActivityDto: CreateSubActivityDto,
+  ): Promise<SubActivity> {
     // Verify the parent activity exists
     const activity = await this.activityRepository.findOne({
-      where: { id: createSubActivityDto.activity_id }
+      where: { id: createSubActivityDto.activity_id },
     });
 
     if (!activity) {
-      throw new NotFoundException(`Activity with ID ${createSubActivityDto.activity_id} not found`);
+      throw new NotFoundException(
+        `Activity with ID ${createSubActivityDto.activity_id} not found`,
+      );
     }
 
     // Verify the user exists
     const user = await this.userRepository.findOne({
-      where: { id: createSubActivityDto.user_id }
+      where: { id: createSubActivityDto.user_id },
     });
 
     if (!user) {
-      throw new NotFoundException(`User with ID ${createSubActivityDto.user_id} not found`);
+      throw new NotFoundException(
+        `User with ID ${createSubActivityDto.user_id} not found`,
+      );
     }
 
     const subActivity = this.subActivityRepository.create(createSubActivityDto);
@@ -45,7 +55,7 @@ export class SubActivitiesService {
   async findAll(): Promise<SubActivity[]> {
     return await this.subActivityRepository.find({
       relations: ['activity', 'user'],
-      order: { start_date: 'ASC' }
+      order: { start_date: 'ASC' },
     });
   }
 
@@ -53,7 +63,7 @@ export class SubActivitiesService {
     return await this.subActivityRepository.find({
       where: { activity_id: activityId },
       relations: ['activity', 'user'],
-      order: { start_date: 'ASC' }
+      order: { start_date: 'ASC' },
     });
   }
 
@@ -61,13 +71,13 @@ export class SubActivitiesService {
     return await this.subActivityRepository.find({
       where: { user_id: userId },
       relations: ['activity', 'user'],
-      order: { start_date: 'ASC' }
+      order: { start_date: 'ASC' },
     });
   }
 
   async findByUserEmail(userEmail: string): Promise<SubActivity[]> {
     const user = await this.userRepository.findOne({
-      where: { email: userEmail }
+      where: { email: userEmail },
     });
 
     if (!user) {
@@ -77,14 +87,14 @@ export class SubActivitiesService {
     return await this.subActivityRepository.find({
       where: { user_id: user.id },
       relations: ['activity', 'user'],
-      order: { start_date: 'ASC' }
+      order: { start_date: 'ASC' },
     });
   }
 
   async findOne(id: string): Promise<SubActivity> {
     const subActivity = await this.subActivityRepository.findOne({
       where: { id },
-      relations: ['activity', 'user']
+      relations: ['activity', 'user'],
     });
 
     if (!subActivity) {
@@ -94,17 +104,25 @@ export class SubActivitiesService {
     return subActivity;
   }
 
-  async update(id: string, updateSubActivityDto: UpdateSubActivityDto): Promise<SubActivity> {
+  async update(
+    id: string,
+    updateSubActivityDto: UpdateSubActivityDto,
+  ): Promise<SubActivity> {
     const subActivity = await this.findOne(id);
 
     // If user_id is being updated, verify the new user exists
-    if (updateSubActivityDto.user_id && updateSubActivityDto.user_id !== subActivity.user_id) {
+    if (
+      updateSubActivityDto.user_id &&
+      updateSubActivityDto.user_id !== subActivity.user_id
+    ) {
       const user = await this.userRepository.findOne({
-        where: { id: updateSubActivityDto.user_id }
+        where: { id: updateSubActivityDto.user_id },
       });
 
       if (!user) {
-        throw new NotFoundException(`User with ID ${updateSubActivityDto.user_id} not found`);
+        throw new NotFoundException(
+          `User with ID ${updateSubActivityDto.user_id} not found`,
+        );
       }
     }
 
@@ -112,17 +130,23 @@ export class SubActivitiesService {
     return await this.subActivityRepository.save(subActivity);
   }
 
-  async updateProgress(id: string, updateProgressDto: UpdateSubActivityProgressDto, userId?: string): Promise<SubActivity> {
+  async updateProgress(
+    id: string,
+    updateProgressDto: UpdateSubActivityProgressDto,
+    userId?: string,
+  ): Promise<SubActivity> {
     const subActivity = await this.findOne(id);
 
     // Check if user is authorized to update this subactivity
     if (userId && subActivity.user_id !== userId) {
-      throw new ForbiddenException('You can only update your own subactivities');
+      throw new ForbiddenException(
+        'You can only update your own subactivities',
+      );
     }
 
     // Update progress and status
     subActivity.progress = updateProgressDto.progress;
-    
+
     if (updateProgressDto.status) {
       subActivity.status = updateProgressDto.status;
     }
@@ -136,8 +160,7 @@ export class SubActivitiesService {
       subActivity.status = ActivityStatus.COMPLETED;
     } else if (updateProgressDto.progress > 0) {
       subActivity.status = ActivityStatus.IN_PROGRESS;
-    }
-    else if (updateProgressDto.progress === 0) {
+    } else if (updateProgressDto.progress === 0) {
       subActivity.status = ActivityStatus.NOT_STARTED;
     }
 
@@ -157,22 +180,29 @@ export class SubActivitiesService {
     average_progress: number;
   }> {
     const subActivities = await this.findByActivityId(activityId);
-    
+
     const total = subActivities.length;
-    const completed = subActivities.filter(sa => sa.status === ActivityStatus.COMPLETED).length;
-    const in_progress = subActivities.filter(sa => sa.status === ActivityStatus.IN_PROGRESS).length;
-    const not_started = subActivities.filter(sa => sa.status === ActivityStatus.NOT_STARTED).length;
-    
-    const average_progress = total > 0 
-      ? subActivities.reduce((sum, sa) => sum + sa.progress, 0) / total 
-      : 0;
+    const completed = subActivities.filter(
+      (sa) => sa.status === ActivityStatus.COMPLETED,
+    ).length;
+    const in_progress = subActivities.filter(
+      (sa) => sa.status === ActivityStatus.IN_PROGRESS,
+    ).length;
+    const not_started = subActivities.filter(
+      (sa) => sa.status === ActivityStatus.NOT_STARTED,
+    ).length;
+
+    const average_progress =
+      total > 0
+        ? subActivities.reduce((sum, sa) => sum + sa.progress, 0) / total
+        : 0;
 
     return {
       total,
       completed,
       in_progress,
       not_started,
-      average_progress: Math.round(average_progress)
+      average_progress: Math.round(average_progress),
     };
   }
-} 
+}

@@ -25,6 +25,6 @@ export class Indicator extends BaseEntity {
   @Column()
   category: string;
 
-  @OneToMany(() => HistoricalData, historicalData => historicalData.indicator)
+  @OneToMany(() => HistoricalData, (historicalData) => historicalData.indicator)
   historical_data: HistoricalData[];
-} 
+}

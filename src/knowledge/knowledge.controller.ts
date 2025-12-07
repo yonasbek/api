@@ -1,5 +1,20 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { KnowledgeService } from './knowledge.service';
 import { CreateArticleDto } from './dto/create-article.dto';
@@ -140,10 +155,7 @@ export class KnowledgeController {
   @Put('tags/:id')
   @ApiOperation({ summary: 'Update tag' })
   @ApiResponse({ status: 200, description: 'Tag updated successfully' })
-  updateTag(
-    @Param('id') id: string,
-    @Body() updateTagDto: UpdateTagDto,
-  ) {
+  updateTag(@Param('id') id: string, @Body() updateTagDto: UpdateTagDto) {
     return this.knowledgeService.updateTag(id, updateTagDto);
   }
 
@@ -153,4 +165,4 @@ export class KnowledgeController {
   removeTag(@Param('id') id: string) {
     return this.knowledgeService.removeTag(id);
   }
-} 
+}

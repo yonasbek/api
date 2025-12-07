@@ -15,4 +15,4 @@ import { Uploads } from './upload.entity';
   providers: [UploadService],
   exports: [UploadService],
 })
-export class UploadModule {} 
+export class UploadModule {}

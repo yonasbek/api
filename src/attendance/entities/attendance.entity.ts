@@ -8,7 +8,7 @@ export enum AttendanceStatus {
   ABSENT = 'absent',
   LATE = 'late',
   LEAVE = 'leave',
-  HOLIDAY = 'holiday'
+  HOLIDAY = 'holiday',
 }
 
 @Entity('attendance')
@@ -30,7 +30,7 @@ export class Attendance extends BaseEntity {
   @Column({
     type: 'enum',
     enum: AttendanceStatus,
-    default: AttendanceStatus.PRESENT
+    default: AttendanceStatus.PRESENT,
   })
   status: AttendanceStatus;
 
@@ -73,4 +73,4 @@ export class Attendance extends BaseEntity {
   @ApiProperty()
   @Column('text', { nullable: true })
   leave_reason: string;
-} 
+}

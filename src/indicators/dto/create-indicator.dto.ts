@@ -24,4 +24,4 @@ export class CreateIndicatorDto {
   @IsString()
   @IsNotEmpty()
   category: string;
-} 
+}

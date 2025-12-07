@@ -10,4 +10,4 @@ import { Reminder } from './entities/reminder.entity';
   providers: [RemindersService],
   exports: [RemindersService],
 })
-export class RemindersModule {} 
+export class RemindersModule {}

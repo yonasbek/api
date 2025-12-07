@@ -114,7 +114,9 @@ export class ImportController {
     status: 404,
     description: 'Import report not found',
   })
-  async deleteImportReport(@Param('id') id: string): Promise<{ message: string }> {
+  async deleteImportReport(
+    @Param('id') id: string,
+  ): Promise<{ message: string }> {
     await this.importService.deleteImportReport(id);
     return { message: 'Import report deleted successfully' };
   }

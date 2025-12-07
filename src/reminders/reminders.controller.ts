@@ -1,5 +1,20 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RemindersService } from './reminders.service';
 import { CreateReminderDto } from './dto/create-reminder.dto';
@@ -36,7 +51,10 @@ export class RemindersController {
   @Put(':id')
   @ApiOperation({ summary: 'Update reminder' })
   @ApiResponse({ status: 200, description: 'Reminder updated successfully' })
-  update(@Param('id') id: string, @Body() updateReminderDto: UpdateReminderDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateReminderDto: UpdateReminderDto,
+  ) {
     return this.remindersService.update(id, updateReminderDto);
   }
 
@@ -46,4 +64,4 @@ export class RemindersController {
   remove(@Param('id') id: string) {
     return this.remindersService.remove(id);
   }
-} 
+}

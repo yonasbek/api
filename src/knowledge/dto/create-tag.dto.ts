@@ -7,8 +7,10 @@ export class CreateTagDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ example: 'Articles related to TypeScript programming language' })
+  @ApiProperty({
+    example: 'Articles related to TypeScript programming language',
+  })
   @IsString()
   @IsOptional()
   description?: string;
-} 
+}

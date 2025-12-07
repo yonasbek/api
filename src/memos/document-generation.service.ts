@@ -13,16 +13,21 @@ export interface DocumentData {
 
 @Injectable()
 export class DocumentGenerationService {
-  
   /**
    * Generate a formatted document from an approved memo
    */
   async generateDocument(memo: Memo): Promise<DocumentData> {
     // Generate memo number based on date and ID
-    const year = memo?.date_of_issue ? new Date(memo?.date_of_issue)?.getFullYear() : new Date().getFullYear();
-    const month = String(memo?.date_of_issue ? new Date(memo?.date_of_issue)?.getMonth() + 1 : new Date().getMonth() + 1).padStart(2, '0');
+    const year = memo?.date_of_issue
+      ? new Date(memo?.date_of_issue)?.getFullYear()
+      : new Date().getFullYear();
+    const month = String(
+      memo?.date_of_issue
+        ? new Date(memo?.date_of_issue)?.getMonth() + 1
+        : new Date().getMonth() + 1,
+    ).padStart(2, '0');
     const memoNumber = `MSLEO/${year}/${month}/${memo?.id?.slice(-6).toUpperCase()}`;
-    
+
     return {
       id: memo.id,
       title: memo.title,
@@ -30,7 +35,7 @@ export class DocumentGenerationService {
       date: memo.date_of_issue,
       signature: memo.signature,
       department: memo.department,
-      memoNumber: memoNumber
+      memoNumber: memoNumber,
     };
   }
 
@@ -38,11 +43,14 @@ export class DocumentGenerationService {
    * Generate HTML template for the document
    */
   generateDocumentHTML(documentData: DocumentData): string {
-    const formattedDate = new Date(documentData.date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    const formattedDate = new Date(documentData.date).toLocaleDateString(
+      'en-US',
+      {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      },
+    );
 
     return `
 <!DOCTYPE html>
@@ -224,7 +232,7 @@ export class DocumentGenerationService {
       signature: documentData.signature,
       department: documentData.department,
       template: 'office_memo_template',
-      generatedAt: new Date()
+      generatedAt: new Date(),
     };
   }
-} 
+}

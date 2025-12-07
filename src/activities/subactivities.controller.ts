@@ -1,16 +1,21 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Body, 
-  Patch, 
-  Param, 
-  Delete, 
-  Query, 
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
   UseGuards,
-  Request
+  Request,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { SubActivitiesService } from './subactivities.service';
 import { CreateSubActivityDto } from './dto/create-subactivity.dto';
 import { UpdateSubActivityDto } from './dto/update-subactivity.dto';
@@ -27,14 +32,24 @@ export class SubActivitiesController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new subactivity' })
-  @ApiResponse({ status: 201, description: 'SubActivity created successfully', type: SubActivity })
-  async create(@Body() createSubActivityDto: CreateSubActivityDto): Promise<SubActivity> {
+  @ApiResponse({
+    status: 201,
+    description: 'SubActivity created successfully',
+    type: SubActivity,
+  })
+  async create(
+    @Body() createSubActivityDto: CreateSubActivityDto,
+  ): Promise<SubActivity> {
     return await this.subActivitiesService.create(createSubActivityDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all subactivities' })
-  @ApiResponse({ status: 200, description: 'Return all subactivities', type: [SubActivity] })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all subactivities',
+    type: [SubActivity],
+  })
   async findAll(
     @Query('activity_id') activityId?: string,
     @Query('user_id') userId?: string,
@@ -54,7 +69,11 @@ export class SubActivitiesController {
 
   @Get('my-tasks')
   @ApiOperation({ summary: 'Get subactivities assigned to current user' })
-  @ApiResponse({ status: 200, description: 'Return user\'s subactivities', type: [SubActivity] })
+  @ApiResponse({
+    status: 200,
+    description: "Return user's subactivities",
+    type: [SubActivity],
+  })
   async getMyTasks(@Request() req): Promise<SubActivity[]> {
     const userId = req.user.id;
     return await this.subActivitiesService.findByUserId(userId);
@@ -69,7 +88,11 @@ export class SubActivitiesController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a subactivity by id' })
-  @ApiResponse({ status: 200, description: 'Return a subactivity', type: SubActivity })
+  @ApiResponse({
+    status: 200,
+    description: 'Return a subactivity',
+    type: SubActivity,
+  })
   @ApiResponse({ status: 404, description: 'SubActivity not found' })
   async findOne(@Param('id') id: string): Promise<SubActivity> {
     return await this.subActivitiesService.findOne(id);
@@ -77,27 +100,42 @@ export class SubActivitiesController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a subactivity' })
-  @ApiResponse({ status: 200, description: 'SubActivity updated successfully', type: SubActivity })
+  @ApiResponse({
+    status: 200,
+    description: 'SubActivity updated successfully',
+    type: SubActivity,
+  })
   @ApiResponse({ status: 404, description: 'SubActivity not found' })
   async update(
     @Param('id') id: string,
-    @Body() updateSubActivityDto: UpdateSubActivityDto
+    @Body() updateSubActivityDto: UpdateSubActivityDto,
   ): Promise<SubActivity> {
     return await this.subActivitiesService.update(id, updateSubActivityDto);
   }
 
   @Patch(':id/progress')
   @ApiOperation({ summary: 'Update subactivity progress' })
-  @ApiResponse({ status: 200, description: 'Progress updated successfully', type: SubActivity })
+  @ApiResponse({
+    status: 200,
+    description: 'Progress updated successfully',
+    type: SubActivity,
+  })
   @ApiResponse({ status: 404, description: 'SubActivity not found' })
-  @ApiResponse({ status: 403, description: 'Not authorized to update this subactivity' })
+  @ApiResponse({
+    status: 403,
+    description: 'Not authorized to update this subactivity',
+  })
   async updateProgress(
     @Param('id') id: string,
     @Body() updateProgressDto: UpdateSubActivityProgressDto,
-    @Request() req
+    @Request() req,
   ): Promise<SubActivity> {
     const userId = req.user.id;
-    return await this.subActivitiesService.updateProgress(id, updateProgressDto, userId);
+    return await this.subActivitiesService.updateProgress(
+      id,
+      updateProgressDto,
+      userId,
+    );
   }
 
   @Delete(':id')
@@ -107,4 +145,4 @@ export class SubActivitiesController {
   async remove(@Param('id') id: string): Promise<void> {
     return await this.subActivitiesService.remove(id);
   }
-} 
+}

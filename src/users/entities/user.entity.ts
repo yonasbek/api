@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Role } from './role.entity';
 import { Department } from './department.entity';
@@ -42,14 +50,14 @@ export class User {
   @Column({ default: true })
   isActive: boolean;
 
-  @ManyToOne(() => Role, role => role.users)
+  @ManyToOne(() => Role, (role) => role.users)
   @JoinColumn({ name: 'roleId' })
   role: Role;
 
   @Column({ nullable: true })
   roleId: string;
 
-  @ManyToOne(() => Department, department => department.users)
+  @ManyToOne(() => Department, (department) => department.users)
   @JoinColumn({ name: 'departmentId' })
   department: Department;
 
@@ -61,4 +69,4 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
-} 
+}

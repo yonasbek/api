@@ -1,5 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { TrainersService } from '../services/trainers.service';
 import { CreateTrainerDto } from '../dto/create-trainer.dto';
 import { UpdateTrainerDto } from '../dto/update-trainer.dto';
@@ -15,7 +31,11 @@ export class TrainersController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new trainer' })
-  @ApiResponse({ status: 201, description: 'Trainer created successfully', type: Trainer })
+  @ApiResponse({
+    status: 201,
+    description: 'Trainer created successfully',
+    type: Trainer,
+  })
   @ApiResponse({ status: 400, description: 'Bad request' })
   async create(@Body() createTrainerDto: CreateTrainerDto): Promise<Trainer> {
     return await this.trainersService.create(createTrainerDto);
@@ -23,10 +43,27 @@ export class TrainersController {
 
   @Get()
   @ApiOperation({ summary: 'Get all trainers' })
-  @ApiResponse({ status: 200, description: 'Return all trainers', type: [Trainer] })
-  @ApiQuery({ name: 'search', required: false, description: 'Search trainers by name or email' })
-  @ApiQuery({ name: 'available', required: false, type: 'boolean', description: 'Get only available trainers' })
-  @ApiQuery({ name: 'courseId', required: false, description: 'Get available trainers for a specific course' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all trainers',
+    type: [Trainer],
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Search trainers by name or email',
+  })
+  @ApiQuery({
+    name: 'available',
+    required: false,
+    type: 'boolean',
+    description: 'Get only available trainers',
+  })
+  @ApiQuery({
+    name: 'courseId',
+    required: false,
+    description: 'Get available trainers for a specific course',
+  })
   async findAll(
     @Query('search') search?: string,
     @Query('available') available?: boolean,
@@ -58,7 +95,11 @@ export class TrainersController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a trainer' })
-  @ApiResponse({ status: 200, description: 'Trainer updated successfully', type: Trainer })
+  @ApiResponse({
+    status: 200,
+    description: 'Trainer updated successfully',
+    type: Trainer,
+  })
   @ApiResponse({ status: 404, description: 'Trainer not found' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   async update(
@@ -72,9 +113,11 @@ export class TrainersController {
   @ApiOperation({ summary: 'Delete a trainer' })
   @ApiResponse({ status: 200, description: 'Trainer deleted successfully' })
   @ApiResponse({ status: 404, description: 'Trainer not found' })
-  @ApiResponse({ status: 400, description: 'Cannot delete trainer with assigned courses' })
+  @ApiResponse({
+    status: 400,
+    description: 'Cannot delete trainer with assigned courses',
+  })
   async remove(@Param('id') id: string): Promise<void> {
     return await this.trainersService.remove(id);
   }
 }
-

@@ -13,6 +13,6 @@ export class HistoricalData extends BaseEntity {
   @Column('decimal', { precision: 10, scale: 2 })
   value: number;
 
-  @ManyToOne(() => Indicator, indicator => indicator.historical_data)
+  @ManyToOne(() => Indicator, (indicator) => indicator.historical_data)
   indicator: Indicator;
-} 
+}

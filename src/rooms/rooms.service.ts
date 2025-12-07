@@ -1,6 +1,16 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, LessThanOrEqual, MoreThanOrEqual, Not } from 'typeorm';
+import {
+  Repository,
+  Between,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Not,
+} from 'typeorm';
 import { Room, RoomStatus } from './entities/room.entity';
 import { Booking } from './entities/booking.entity';
 import { CreateRoomDto } from './dto/create-room.dto';
@@ -21,13 +31,14 @@ export class RoomsService {
     const room = this.roomRepository.create({
       ...createRoomDto,
       status: RoomStatus.AVAILABLE,
-      facilities: createRoomDto.facilities?.map(f => ({
-        id: f.id,
-        name: f.name,
-        icon: f.icon
-      })) || []
+      facilities:
+        createRoomDto.facilities?.map((f) => ({
+          id: f.id,
+          name: f.name,
+          icon: f.icon,
+        })) || [],
     });
-    return await this.roomRepository.save(room as Room);
+    return await this.roomRepository.save(room);
   }
 
   async findAllRooms(): Promise<Room[]> {
@@ -48,10 +59,10 @@ export class RoomsService {
   async updateRoom(id: string, updateRoomDto: UpdateRoomDto): Promise<Room> {
     const room = await this.findOneRoom(id);
     if (updateRoomDto.facilities) {
-      updateRoomDto.facilities = updateRoomDto.facilities.map(f => ({
+      updateRoomDto.facilities = updateRoomDto.facilities.map((f) => ({
         id: f.id,
         name: f.name,
-        icon: f.icon
+        icon: f.icon,
       }));
     }
     Object.assign(room, updateRoomDto);
@@ -83,13 +94,15 @@ export class RoomsService {
     });
 
     if (conflicts.length > 0) {
-      throw new BadRequestException('Room is already booked for this time slot');
+      throw new BadRequestException(
+        'Room is already booked for this time slot',
+      );
     }
 
     const booking = this.bookingRepository.create({
       ...createBookingDto,
       start_time: startTime,
-      end_time: endTime
+      end_time: endTime,
     });
     return await this.bookingRepository.save(booking);
   }
@@ -111,14 +124,21 @@ export class RoomsService {
     return booking;
   }
 
-  async updateBooking(id: string, updateBookingDto: UpdateBookingDto): Promise<Booking> {
+  async updateBooking(
+    id: string,
+    updateBookingDto: UpdateBookingDto,
+  ): Promise<Booking> {
     const booking = await this.findOneBooking(id);
-    
+
     // If updating time slots, check for conflicts
     if (updateBookingDto.start_time || updateBookingDto.end_time) {
-      const startTime = updateBookingDto.start_time ? new Date(updateBookingDto.start_time) : booking.start_time;
-      const endTime = updateBookingDto.end_time ? new Date(updateBookingDto.end_time) : booking.end_time;
-      
+      const startTime = updateBookingDto.start_time
+        ? new Date(updateBookingDto.start_time)
+        : booking.start_time;
+      const endTime = updateBookingDto.end_time
+        ? new Date(updateBookingDto.end_time)
+        : booking.end_time;
+
       const conflicts = await this.bookingRepository.find({
         where: {
           id: Not(id),
@@ -129,20 +149,22 @@ export class RoomsService {
       });
 
       if (conflicts.length > 0) {
-        throw new BadRequestException('Room is already booked for this time slot');
+        throw new BadRequestException(
+          'Room is already booked for this time slot',
+        );
       }
 
       // Update the DTO with the Date objects
       if (updateBookingDto.start_time) {
         updateBookingDto = {
           ...updateBookingDto,
-          start_time: startTime.toISOString()
+          start_time: startTime.toISOString(),
         };
       }
       if (updateBookingDto.end_time) {
         updateBookingDto = {
           ...updateBookingDto,
-          end_time: endTime.toISOString()
+          end_time: endTime.toISOString(),
         };
       }
     }
@@ -158,7 +180,11 @@ export class RoomsService {
     }
   }
 
-  async findAvailableRooms(start_time: Date, end_time: Date, capacity?: number): Promise<Room[]> {
+  async findAvailableRooms(
+    start_time: Date,
+    end_time: Date,
+    capacity?: number,
+  ): Promise<Room[]> {
     // Get all rooms that match capacity requirement
     let rooms = await this.roomRepository.find({
       where: capacity ? { capacity: MoreThanOrEqual(capacity) } : {},
@@ -173,8 +199,8 @@ export class RoomsService {
     });
 
     // Filter out rooms that have conflicting bookings
-    const bookedRoomIds = new Set(bookings.map(booking => booking.room_id));
-    rooms = rooms.filter(room => !bookedRoomIds.has(room.id));
+    const bookedRoomIds = new Set(bookings.map((booking) => booking.room_id));
+    rooms = rooms.filter((room) => !bookedRoomIds.has(room.id));
 
     return rooms;
   }
@@ -184,4 +210,4 @@ export class RoomsService {
       where: { room_id: roomId },
     });
   }
-} 
+}

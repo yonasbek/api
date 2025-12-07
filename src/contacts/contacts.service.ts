@@ -1,8 +1,16 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, FindOptionsWhere, ILike } from 'typeorm';
 import { Contact } from './entities/contact.entity';
-import { ContactSuggestion, SuggestionStatus, SuggestionType } from './entities/contact-suggestion.entity';
+import {
+  ContactSuggestion,
+  SuggestionStatus,
+  SuggestionType,
+} from './entities/contact-suggestion.entity';
 import { User } from '../users/entities/user.entity';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
@@ -16,7 +24,11 @@ export interface ContactSearchParams {
   position?: ContactPosition;
   region?: string;
   isActive?: boolean;
-  sortBy?: 'instituteName' | 'individualName' | 'organizationType' | 'created_at';
+  sortBy?:
+    | 'instituteName'
+    | 'individualName'
+    | 'organizationType'
+    | 'created_at';
   sortOrder?: 'ASC' | 'DESC';
   page?: number;
   limit?: number;
@@ -39,7 +51,7 @@ export class ContactsService {
     private readonly suggestionRepository: Repository<ContactSuggestion>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) { }
+  ) {}
 
   // === CONTACT MANAGEMENT ===
 
@@ -48,7 +60,9 @@ export class ContactsService {
     return await this.contactRepository.save(contact);
   }
 
-  async findAll(params: ContactSearchParams = {}): Promise<{ contacts: Contact[]; total: number }> {
+  async findAll(
+    params: ContactSearchParams = {},
+  ): Promise<{ contacts: Contact[]; total: number }> {
     const {
       search,
       organizationType,
@@ -58,7 +72,7 @@ export class ContactsService {
       sortBy = 'instituteName',
       sortOrder = 'ASC',
       page = 1,
-      limit = 50
+      limit = 50,
     } = params;
 
     const queryBuilder = this.contactRepository.createQueryBuilder('contact');
@@ -67,12 +81,14 @@ export class ContactsService {
     if (search) {
       queryBuilder.andWhere(
         '(contact.instituteName ILIKE :search OR contact.individualName ILIKE :search OR contact.emailAddress ILIKE :search OR contact.phoneNumber ILIKE :search)',
-        { search: `%${search}%` }
+        { search: `%${search}%` },
       );
     }
 
     if (organizationType) {
-      queryBuilder.andWhere('contact.organizationType = :organizationType', { organizationType });
+      queryBuilder.andWhere('contact.organizationType = :organizationType', {
+        organizationType,
+      });
     }
 
     if (position) {
@@ -80,7 +96,9 @@ export class ContactsService {
     }
 
     if (region) {
-      queryBuilder.andWhere('contact.region ILIKE :region', { region: `%${region}%` });
+      queryBuilder.andWhere('contact.region ILIKE :region', {
+        region: `%${region}%`,
+      });
     }
 
     queryBuilder.andWhere('contact.isActive = :isActive', { isActive });
@@ -105,7 +123,10 @@ export class ContactsService {
     return contact;
   }
 
-  async update(id: string, updateContactDto: UpdateContactDto): Promise<Contact> {
+  async update(
+    id: string,
+    updateContactDto: UpdateContactDto,
+  ): Promise<Contact> {
     const contact = await this.findOne(id);
     Object.assign(contact, updateContactDto);
     return await this.contactRepository.save(contact);
@@ -126,30 +147,36 @@ export class ContactsService {
         { instituteName: ILike(`%${query}%`) },
         { individualName: ILike(`%${query}%`) },
         { emailAddress: ILike(`%${query}%`) },
-        { phoneNumber: ILike(`%${query}%`) }
+        { phoneNumber: ILike(`%${query}%`) },
       ],
-      order: { instituteName: 'ASC' }
+      order: { instituteName: 'ASC' },
     });
   }
 
-  async findByOrganizationType(organizationType: ContactType): Promise<Contact[]> {
+  async findByOrganizationType(
+    organizationType: ContactType,
+  ): Promise<Contact[]> {
     return await this.contactRepository.find({
       where: { organizationType, isActive: true },
-      order: { instituteName: 'ASC' }
+      order: { instituteName: 'ASC' },
     });
   }
 
   async getActiveContacts(): Promise<Contact[]> {
     return await this.contactRepository.find({
       where: { isActive: true },
-      order: { instituteName: 'ASC' }
+      order: { instituteName: 'ASC' },
     });
   }
 
   // === AUTOCOMPLETE SUGGESTIONS ===
 
-  async getAutocompleteOptions(field: 'instituteName' | 'region', query: string): Promise<string[]> {
-    const queryBuilder = this.contactRepository.createQueryBuilder('contact')
+  async getAutocompleteOptions(
+    field: 'instituteName' | 'region',
+    query: string,
+  ): Promise<string[]> {
+    const queryBuilder = this.contactRepository
+      .createQueryBuilder('contact')
       .select(`DISTINCT contact.${field}`, field)
       .where(`contact.${field} ILIKE :query`, { query: `%${query}%` })
       .andWhere('contact.isActive = :isActive', { isActive: true })
@@ -157,13 +184,15 @@ export class ContactsService {
       .limit(10);
 
     const results = await queryBuilder.getRawMany();
-    return results.map(result => result[field]).filter(Boolean);
+    return results.map((result) => result[field]).filter(Boolean);
   }
 
-  async getAutocompleteData(query: string = ''): Promise<{ institutions: string[]; regions: string[] }> {
+  async getAutocompleteData(
+    query: string = '',
+  ): Promise<{ institutions: string[]; regions: string[] }> {
     const [institutions, regions] = await Promise.all([
       this.getAutocompleteOptions('instituteName', query),
-      this.getAutocompleteOptions('region', query)
+      this.getAutocompleteOptions('region', query),
     ]);
 
     return { institutions, regions };
@@ -174,13 +203,13 @@ export class ContactsService {
   async getStats(): Promise<ContactStats> {
     const contacts = await this.contactRepository.find();
     const pendingSuggestions = await this.suggestionRepository.count({
-      where: { status: SuggestionStatus.PENDING }
+      where: { status: SuggestionStatus.PENDING },
     });
 
     const stats: ContactStats = {
       totalContacts: contacts.length,
-      activeContacts: contacts.filter(c => c.isActive).length,
-      inactiveContacts: contacts.filter(c => !c.isActive).length,
+      activeContacts: contacts.filter((c) => c.isActive).length,
+      inactiveContacts: contacts.filter((c) => !c.isActive).length,
       byOrganizationType: {
         [ContactType.MOH_AGENCIES]: 0,
         [ContactType.REGIONAL_HEALTH_BUREAU]: 0,
@@ -188,13 +217,13 @@ export class ContactsService {
         [ContactType.ADDIS_ABABA_HOSPITALS]: 0,
         [ContactType.UNIVERSITY_HOSPITALS]: 0,
         [ContactType.ASSOCIATIONS]: 0,
-        [ContactType.PARTNERS]: 0
+        [ContactType.PARTNERS]: 0,
       },
-      pendingSuggestions
+      pendingSuggestions,
     };
 
     // Count by categories
-    contacts.forEach(contact => {
+    contacts.forEach((contact) => {
       if (contact.isActive) {
         stats.byOrganizationType[contact.organizationType]++;
       }
@@ -207,7 +236,7 @@ export class ContactsService {
 
   async createSuggestion(
     createSuggestionDto: CreateContactSuggestionDto,
-    userId: string
+    userId: string,
   ): Promise<ContactSuggestion> {
     // Verify user exists
     try {
@@ -222,30 +251,33 @@ export class ContactsService {
         const contact = await this.findOne(createSuggestionDto.contact_id);
         if (!contact) {
           console.log('contact not found', createSuggestionDto.contact_id);
-          throw new NotFoundException(`Contact with ID ${createSuggestionDto.contact_id} not found`);
+          throw new NotFoundException(
+            `Contact with ID ${createSuggestionDto.contact_id} not found`,
+          );
         }
       }
 
       const suggestion = this.suggestionRepository.create({
         ...createSuggestionDto,
-        suggested_by_user_id: userId
+        suggested_by_user_id: userId,
       });
-
 
       const savedSuggestion = await this.suggestionRepository.save(suggestion);
 
       return savedSuggestion;
     } catch (error) {
-      return error
+      return error;
     }
   }
 
-  async findAllSuggestions(status?: SuggestionStatus): Promise<ContactSuggestion[]> {
+  async findAllSuggestions(
+    status?: SuggestionStatus,
+  ): Promise<ContactSuggestion[]> {
     const where = status ? { status } : {};
     return await this.suggestionRepository.find({
       where,
       relations: ['contact', 'suggestedBy', 'reviewedBy'],
-      order: { created_at: 'DESC' }
+      order: { created_at: 'DESC' },
     });
   }
 
@@ -253,22 +285,24 @@ export class ContactsService {
     return await this.suggestionRepository.find({
       where: { suggested_by_user_id: userId },
       relations: ['contact', 'suggestedBy', 'reviewedBy'],
-      order: { created_at: 'DESC' }
+      order: { created_at: 'DESC' },
     });
   }
 
   async reviewSuggestion(
     suggestionId: string,
     reviewDto: ReviewContactSuggestionDto,
-    reviewerId: string
+    reviewerId: string,
   ): Promise<ContactSuggestion> {
     const suggestion = await this.suggestionRepository.findOne({
       where: { id: suggestionId },
-      relations: ['contact', 'suggestedBy']
+      relations: ['contact', 'suggestedBy'],
     });
 
     if (!suggestion) {
-      throw new NotFoundException(`Suggestion with ID ${suggestionId} not found`);
+      throw new NotFoundException(
+        `Suggestion with ID ${suggestionId} not found`,
+      );
     }
 
     if (suggestion.status !== SuggestionStatus.PENDING) {
@@ -282,16 +316,27 @@ export class ContactsService {
     suggestion.reviewNotes = reviewDto.reviewNotes;
 
     // If approved, apply changes
-    if (reviewDto.status === SuggestionStatus.APPROVED && suggestion.suggestedChanges) {
-      if (suggestion.suggestionType === SuggestionType.UPDATE && suggestion.contact) {
+    if (
+      reviewDto.status === SuggestionStatus.APPROVED &&
+      suggestion.suggestedChanges
+    ) {
+      if (
+        suggestion.suggestionType === SuggestionType.UPDATE &&
+        suggestion.contact
+      ) {
         // Apply changes to existing contact
         Object.assign(suggestion.contact, suggestion.suggestedChanges);
         await this.contactRepository.save(suggestion.contact);
       } else if (suggestion.suggestionType === SuggestionType.ADD) {
         // Create new contact
-        const newContact = this.contactRepository.create(suggestion.suggestedChanges);
+        const newContact = this.contactRepository.create(
+          suggestion.suggestedChanges,
+        );
         await this.contactRepository.save(newContact);
-      } else if (suggestion.suggestionType === SuggestionType.DELETE && suggestion.contact) {
+      } else if (
+        suggestion.suggestionType === SuggestionType.DELETE &&
+        suggestion.contact
+      ) {
         // Soft delete contact
         suggestion.contact.isActive = false;
         await this.contactRepository.save(suggestion.contact);
@@ -303,7 +348,9 @@ export class ContactsService {
 
   // === BULK OPERATIONS ===
 
-  async bulkImport(contacts: CreateContactDto[]): Promise<{ success: number; errors: string[] }> {
+  async bulkImport(
+    contacts: CreateContactDto[],
+  ): Promise<{ success: number; errors: string[] }> {
     const results = { success: 0, errors: [] };
 
     for (const contactData of contacts) {
@@ -312,7 +359,6 @@ export class ContactsService {
         results.success++;
       } catch (error) {
         console.log(error, 'error here');
-
       }
     }
 
@@ -320,10 +366,12 @@ export class ContactsService {
   }
 
   async exportContacts(organizationType?: ContactType): Promise<Contact[]> {
-    const where = organizationType ? { organizationType, isActive: true } : { isActive: true };
+    const where = organizationType
+      ? { organizationType, isActive: true }
+      : { isActive: true };
     return await this.contactRepository.find({
       where,
-      order: { organizationType: 'ASC', instituteName: 'ASC' }
+      order: { organizationType: 'ASC', instituteName: 'ASC' },
     });
   }
-} 
+}

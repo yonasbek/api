@@ -1,4 +1,11 @@
-import { Entity, Column, OneToMany, ManyToMany, JoinTable, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+  ManyToOne,
+} from 'typeorm';
 import { BaseEntity } from '../../common/entities/base.entity';
 import { MemoSignature } from './memo-signature.entity';
 import { MemoStatus } from '../dto/create-memo.dto';
@@ -8,13 +15,13 @@ import { User } from '../../users/entities/user.entity';
 export enum MemoType {
   GENERAL = 'GENERAL',
   INSTRUCTIONAL = 'INSTRUCTIONAL',
-  INFORMATIONAL = 'INFORMATIONAL'
+  INFORMATIONAL = 'INFORMATIONAL',
 }
 
 export enum PriorityLevel {
   NORMAL = 'NORMAL',
   URGENT = 'URGENT',
-  CONFIDENTIAL = 'CONFIDENTIAL'
+  CONFIDENTIAL = 'CONFIDENTIAL',
 }
 
 @Entity('memos')
@@ -27,7 +34,7 @@ export class Memo extends BaseEntity {
   @Column({
     type: 'enum',
     enum: MemoType,
-    default: MemoType.GENERAL
+    default: MemoType.GENERAL,
   })
   memo_type: MemoType;
 
@@ -47,7 +54,7 @@ export class Memo extends BaseEntity {
   @JoinTable({
     name: 'memo_recipients',
     joinColumn: { name: 'memo_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' }
+    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
   })
   recipients: User[];
 
@@ -59,7 +66,7 @@ export class Memo extends BaseEntity {
   @Column({
     type: 'enum',
     enum: PriorityLevel,
-    default: PriorityLevel.NORMAL
+    default: PriorityLevel.NORMAL,
   })
   priority_level: PriorityLevel;
 
@@ -71,7 +78,7 @@ export class Memo extends BaseEntity {
   @Column({
     type: 'enum',
     enum: MemoStatus,
-    default: MemoStatus.DRAFT
+    default: MemoStatus.DRAFT,
   })
   status: MemoStatus;
 
@@ -114,6 +121,6 @@ export class Memo extends BaseEntity {
   @Column('timestamp with time zone', { nullable: true })
   submitted_to_leo_at?: Date;
 
-  @OneToMany(() => MemoSignature, signature => signature.memo)
+  @OneToMany(() => MemoSignature, (signature) => signature.memo)
   signatures: MemoSignature[];
-} 
+}

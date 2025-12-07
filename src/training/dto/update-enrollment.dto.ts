@@ -1,14 +1,30 @@
-import { IsOptional, IsEnum, IsInt, IsNumber, IsString, IsBoolean, IsDateString, Min, Max } from 'class-validator';
+import {
+  IsOptional,
+  IsEnum,
+  IsInt,
+  IsNumber,
+  IsString,
+  IsBoolean,
+  IsDateString,
+  Min,
+  Max,
+} from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { EnrollmentStatus } from '../entities/course-enrollment.entity';
 
 export class UpdateEnrollmentDto {
-  @ApiPropertyOptional({ description: 'Enrollment status', enum: EnrollmentStatus })
+  @ApiPropertyOptional({
+    description: 'Enrollment status',
+    enum: EnrollmentStatus,
+  })
   @IsOptional()
   @IsEnum(EnrollmentStatus)
   status?: EnrollmentStatus;
 
-  @ApiPropertyOptional({ description: 'Progress percentage (0-100)', example: 75 })
+  @ApiPropertyOptional({
+    description: 'Progress percentage (0-100)',
+    example: 75,
+  })
   @IsOptional()
   @IsInt()
   @Min(0)

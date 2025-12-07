@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere } from 'typeorm';
 import { Memo } from './entities/memo.entity';
@@ -6,9 +11,15 @@ import { MemoStatus } from './dto/create-memo.dto';
 import { MemoSignature } from './entities/memo-signature.entity';
 import { CreateMemoDto } from './dto/create-memo.dto';
 import { UpdateMemoDto } from './dto/update-memo.dto';
-import { CreateSignatureDto, SignatureAction } from './dto/create-signature.dto';
+import {
+  CreateSignatureDto,
+  SignatureAction,
+} from './dto/create-signature.dto';
 import { WorkflowActionDto, WorkflowAction } from './dto/workflow-action.dto';
-import { DocumentGenerationService, DocumentData } from './document-generation.service';
+import {
+  DocumentGenerationService,
+  DocumentData,
+} from './document-generation.service';
 import { UploadService } from '../upload/upload.service';
 import { User } from '../users/entities/user.entity';
 import { Module } from '../upload/upload.entity';
@@ -31,12 +42,12 @@ export class MemosService {
 
     // Verify all recipients exist
     const recipients = await Promise.all(
-      recipient_ids.map(id => this.userRepository.findOne({ where: { id } }))
+      recipient_ids.map((id) => this.userRepository.findOne({ where: { id } })),
     );
 
     const memo = this.memoRepository.create({
       ...memoData,
-      recipients: recipients.filter(user => user !== null) as User[],
+      recipients: recipients.filter((user) => user !== null),
     });
 
     return await this.memoRepository.save(memo);
@@ -70,9 +81,11 @@ export class MemosService {
 
     if (recipient_ids) {
       const recipients = await Promise.all(
-        recipient_ids.map(id => this.userRepository.findOne({ where: { id } }))
+        recipient_ids.map((id) =>
+          this.userRepository.findOne({ where: { id } }),
+        ),
       );
-      memo.recipients = recipients.filter(user => user !== null) as User[];
+      memo.recipients = recipients.filter((user) => user !== null);
     }
 
     Object.assign(memo, updateData);
@@ -93,23 +106,31 @@ export class MemosService {
     }
   }
 
-  async addAttachments(id: string, files: Express.Multer.File[]): Promise<Memo> {
+  async addAttachments(
+    id: string,
+    files: Express.Multer.File[],
+  ): Promise<Memo> {
     const memo = await this.findOne(id);
-    
-    const uploadedFiles = await this.uploadService.uploadFiles(files, Module.MEMO);
-    
+
+    const uploadedFiles = await this.uploadService.uploadFiles(
+      files,
+      Module.MEMO,
+    );
+
     // Merge new files with existing ones
     const existingFiles = memo.attachments || [];
     memo.attachments = [...existingFiles, ...uploadedFiles];
-    
+
     return await this.memoRepository.save(memo);
   }
 
   async removeAttachment(id: string, fileName: string): Promise<Memo> {
     const memo = await this.findOne(id);
-    
+
     if (!memo.attachments?.includes(fileName)) {
-      throw new BadRequestException(`File ${fileName} not found in memo's attachments`);
+      throw new BadRequestException(
+        `File ${fileName} not found in memo's attachments`,
+      );
     }
 
     // Remove file from storage
@@ -117,7 +138,7 @@ export class MemosService {
 
     // Remove file from memo's attachments
     memo.attachments = memo.attachments.filter(
-      (attachment) => attachment !== fileName
+      (attachment) => attachment !== fileName,
     );
 
     return await this.memoRepository.save(memo);
@@ -168,8 +189,6 @@ export class MemosService {
     if (memo.status !== MemoStatus.DRAFT) {
       throw new BadRequestException('Can only update memos in draft status');
     }
-    
-
 
     Object.assign(memo, updateMemoDto);
     return await this.memoRepository.save(memo);
@@ -277,24 +296,30 @@ export class MemosService {
    */
   async submitToDeskHead(id: string, userId: string): Promise<Memo> {
     const memo = await this.findOne(id);
-    
+
     if (memo.status !== MemoStatus.DRAFT) {
       throw new BadRequestException('Can only submit memos in draft status');
     }
 
     memo.status = MemoStatus.PENDING_DESK_HEAD;
     memo.submitted_to_desk_head_at = new Date();
-    
+
     return await this.memoRepository.save(memo);
   }
 
   /**
    * Desk head reviews memo and performs workflow action
    */
-  async deskHeadAction(id: string, workflowActionDto: WorkflowActionDto, userId: string): Promise<Memo> {
+  async deskHeadAction(
+    id: string,
+    workflowActionDto: WorkflowActionDto,
+    userId: string,
+  ): Promise<Memo> {
     const memo = await this.findOne(id);
-    const reviewer = await this.userRepository.findOne({ where: { id: userId } });
-    
+    const reviewer = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
     // if (!reviewer) {
     //   throw new NotFoundException('Reviewer not found');
     // }
@@ -330,47 +355,51 @@ export class MemosService {
   /**
    * LEO reviews memo and performs workflow action
    */
-  async leoAction(id: string, workflowActionDto: WorkflowActionDto, userId: string): Promise<Memo> {
+  async leoAction(
+    id: string,
+    workflowActionDto: WorkflowActionDto,
+    userId: string,
+  ): Promise<Memo> {
     try {
-      
-   
-    const memo = await this.findOne(id);
-    const reviewer = await this.userRepository.findOne({ where: { id: userId } });
-    
-    // if (!reviewer) {
-    //   throw new NotFoundException('Reviewer not found');
-    // }
+      const memo = await this.findOne(id);
+      const reviewer = await this.userRepository.findOne({
+        where: { id: userId },
+      });
 
-    // if (memo.status !== MemoStatus.PENDING_LEO) {
-    //   throw new BadRequestException('Memo is not pending LEO review');
-    // }
+      // if (!reviewer) {
+      //   throw new NotFoundException('Reviewer not found');
+      // }
 
-    // TODO: Add role-based authorization check for LEO role
+      // if (memo.status !== MemoStatus.PENDING_LEO) {
+      //   throw new BadRequestException('Memo is not pending LEO review');
+      // }
 
-    memo.leo_comment = workflowActionDto.comment;
-    memo.leo_reviewed_at = new Date();
-    memo.leo_reviewer = reviewer as User;
+      // TODO: Add role-based authorization check for LEO role
 
-    switch (workflowActionDto.action) {
-      case WorkflowAction.APPROVE:
-        memo.status = MemoStatus.APPROVED;
-        memo.approved_at = new Date();
-        break;
-      case WorkflowAction.RETURN_TO_CREATOR:
-        memo.status = MemoStatus.RETURNED_TO_CREATOR;
-        break;
-      case WorkflowAction.REJECT:
-        memo.status = MemoStatus.REJECTED;
-        break;
-      default:
-        console.log(workflowActionDto.action);
-        throw new BadRequestException('Invalid action for LEO');
+      memo.leo_comment = workflowActionDto.comment;
+      memo.leo_reviewed_at = new Date();
+      memo.leo_reviewer = reviewer as User;
+
+      switch (workflowActionDto.action) {
+        case WorkflowAction.APPROVE:
+          memo.status = MemoStatus.APPROVED;
+          memo.approved_at = new Date();
+          break;
+        case WorkflowAction.RETURN_TO_CREATOR:
+          memo.status = MemoStatus.RETURNED_TO_CREATOR;
+          break;
+        case WorkflowAction.REJECT:
+          memo.status = MemoStatus.REJECTED;
+          break;
+        default:
+          console.log(workflowActionDto.action);
+          throw new BadRequestException('Invalid action for LEO');
+      }
+
+      return await this.memoRepository.save(memo);
+    } catch (error) {
+      return error;
     }
-
-    return await this.memoRepository.save(memo);
- } catch (error) {
-  return error;
- }
   }
 
   /**
@@ -378,13 +407,18 @@ export class MemosService {
    */
   async generateDocument(id: string): Promise<any> {
     const memo = await this.findOne(id);
-    
+
     if (memo.status !== MemoStatus.APPROVED) {
-      throw new BadRequestException('Can only generate documents for approved memos');
+      throw new BadRequestException(
+        'Can only generate documents for approved memos',
+      );
     }
 
-    const documentData = await this.documentGenerationService.generateDocument(memo);
-    return this.documentGenerationService.generateDocumentTemplate(documentData);
+    const documentData =
+      await this.documentGenerationService.generateDocument(memo);
+    return this.documentGenerationService.generateDocumentTemplate(
+      documentData,
+    );
   }
 
   /**
@@ -392,12 +426,15 @@ export class MemosService {
    */
   async generateHTMLDocument(id: string): Promise<string> {
     const memo = await this.findOne(id);
-    
+
     if (memo.status !== MemoStatus.APPROVED) {
-      throw new BadRequestException('Can only generate documents for approved memos');
+      throw new BadRequestException(
+        'Can only generate documents for approved memos',
+      );
     }
 
-    const documentData = await this.documentGenerationService.generateDocument(memo);
+    const documentData =
+      await this.documentGenerationService.generateDocument(memo);
     return this.documentGenerationService.generateDocumentHTML(documentData);
   }
 
@@ -419,19 +456,27 @@ export class MemosService {
       currentStatus: memo.status,
       createdAt: memo.created_at,
       submittedToDeskHeadAt: memo?.submitted_to_desk_head_at,
-      deskHeadReview: memo?.desk_head_reviewed_at ? {
-        reviewedAt: memo?.desk_head_reviewed_at,
-        reviewer: memo.desk_head_reviewer?.id || null,
-        reviewerName: memo?.desk_head_reviewer ? `${memo?.desk_head_reviewer?.firstName} ${memo?.desk_head_reviewer?.lastName}` : null,
-        comment: memo?.desk_head_comment,
-      } : null,
+      deskHeadReview: memo?.desk_head_reviewed_at
+        ? {
+            reviewedAt: memo?.desk_head_reviewed_at,
+            reviewer: memo.desk_head_reviewer?.id || null,
+            reviewerName: memo?.desk_head_reviewer
+              ? `${memo?.desk_head_reviewer?.firstName} ${memo?.desk_head_reviewer?.lastName}`
+              : null,
+            comment: memo?.desk_head_comment,
+          }
+        : null,
       submittedToLeoAt: memo?.submitted_to_leo_at,
-      leoReview: memo?.leo_reviewed_at ? {
-        reviewedAt: memo?.leo_reviewed_at,
-        reviewer: memo?.leo_reviewer?.id || null,
-        reviewerName: memo?.leo_reviewer ? `${memo?.leo_reviewer?.firstName} ${memo?.leo_reviewer?.lastName}` : null,
-        comment: memo?.leo_comment,
-      } : null,
+      leoReview: memo?.leo_reviewed_at
+        ? {
+            reviewedAt: memo?.leo_reviewed_at,
+            reviewer: memo?.leo_reviewer?.id || null,
+            reviewerName: memo?.leo_reviewer
+              ? `${memo?.leo_reviewer?.firstName} ${memo?.leo_reviewer?.lastName}`
+              : null,
+            comment: memo?.leo_comment,
+          }
+        : null,
       approvedAt: memo.approved_at,
     };
   }
@@ -462,4 +507,4 @@ export class MemosService {
   async getMemosPendingLEO(): Promise<Memo[]> {
     return await this.findMemosByWorkflowStatus(MemoStatus.PENDING_LEO);
   }
-} 
+}

@@ -1,5 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
@@ -86,7 +101,10 @@ export class RoomsController {
   @Patch('bookings/:id')
   @ApiOperation({ summary: 'Update a booking' })
   @ApiResponse({ status: 200, description: 'Booking updated successfully' })
-  updateBooking(@Param('id') id: string, @Body() updateBookingDto: UpdateBookingDto) {
+  updateBooking(
+    @Param('id') id: string,
+    @Body() updateBookingDto: UpdateBookingDto,
+  ) {
     return this.roomsService.updateBooking(id, updateBookingDto);
   }
 
@@ -103,4 +121,4 @@ export class RoomsController {
   getBookingsByRoomId(@Param('id') id: string) {
     return this.roomsService.getBookingsByRoomId(id);
   }
-} 
+}

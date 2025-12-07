@@ -1,5 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { TraineesService } from '../services/trainees.service';
 import { CreateTraineeDto } from '../dto/create-trainee.dto';
 import { UpdateTraineeDto } from '../dto/update-trainee.dto';
@@ -15,7 +31,11 @@ export class TraineesController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new trainee' })
-  @ApiResponse({ status: 201, description: 'Trainee created successfully', type: Trainee })
+  @ApiResponse({
+    status: 201,
+    description: 'Trainee created successfully',
+    type: Trainee,
+  })
   @ApiResponse({ status: 400, description: 'Bad request' })
   async create(@Body() createTraineeDto: CreateTraineeDto): Promise<Trainee> {
     return await this.traineesService.create(createTraineeDto);
@@ -23,11 +43,17 @@ export class TraineesController {
 
   @Get()
   @ApiOperation({ summary: 'Get all trainees' })
-  @ApiResponse({ status: 200, description: 'Return all trainees', type: [Trainee] })
-  @ApiQuery({ name: 'search', required: false, description: 'Search trainees by name or email' })
-  async findAll(
-    @Query('search') search?: string,
-  ): Promise<Trainee[]> {
+  @ApiResponse({
+    status: 200,
+    description: 'Return all trainees',
+    type: [Trainee],
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Search trainees by name or email',
+  })
+  async findAll(@Query('search') search?: string): Promise<Trainee[]> {
     if (search) {
       return await this.traineesService.searchTrainees(search);
     }
@@ -51,7 +77,11 @@ export class TraineesController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a trainee' })
-  @ApiResponse({ status: 200, description: 'Trainee updated successfully', type: Trainee })
+  @ApiResponse({
+    status: 200,
+    description: 'Trainee updated successfully',
+    type: Trainee,
+  })
   @ApiResponse({ status: 404, description: 'Trainee not found' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   async update(
@@ -65,9 +95,11 @@ export class TraineesController {
   @ApiOperation({ summary: 'Delete a trainee' })
   @ApiResponse({ status: 200, description: 'Trainee deleted successfully' })
   @ApiResponse({ status: 404, description: 'Trainee not found' })
-  @ApiResponse({ status: 400, description: 'Cannot delete trainee with existing enrollments' })
+  @ApiResponse({
+    status: 400,
+    description: 'Cannot delete trainee with existing enrollments',
+  })
   async remove(@Param('id') id: string): Promise<void> {
     return await this.traineesService.remove(id);
   }
 }
-

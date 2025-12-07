@@ -9,7 +9,7 @@ export enum Module {
   DOCUMENT = 'DOCUMENT',
   OTHER = 'OTHER',
   MEMO = 'MEMO',
-  KNOWLEDGE_BASE = 'KNOWLEDGE_BASE'
+  KNOWLEDGE_BASE = 'KNOWLEDGE_BASE',
 }
 
 @Entity('uploads')
@@ -37,4 +37,4 @@ export class Uploads extends BaseEntity {
   @ApiProperty({ example: 'Activity' })
   @Column({ nullable: true })
   module: string;
-} 
+}

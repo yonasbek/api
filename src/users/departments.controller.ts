@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Department } from './entities/department.entity';
@@ -26,7 +34,9 @@ export class DepartmentsController {
   }
 
   @Post()
-  async create(@Body() departmentData: Partial<Department>): Promise<Department> {
+  async create(
+    @Body() departmentData: Partial<Department>,
+  ): Promise<Department> {
     const department = this.departmentsRepository.create(departmentData);
     return this.departmentsRepository.save(department);
   }
@@ -47,4 +57,4 @@ export class DepartmentsController {
   async remove(@Param('id') id: string): Promise<void> {
     await this.departmentsRepository.delete(id);
   }
-} 
+}

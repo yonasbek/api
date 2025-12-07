@@ -15,28 +15,25 @@ import { CourseEnrollment } from './entities/course-enrollment.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Course, Trainer, Trainee, CourseEnrollment])
+    TypeOrmModule.forFeature([Course, Trainer, Trainee, CourseEnrollment]),
   ],
   controllers: [
     CoursesController,
     TrainersController,
     TraineesController,
-    EnrollmentsController
+    EnrollmentsController,
   ],
   providers: [
     CoursesService,
     TrainersService,
     TraineesService,
-    EnrollmentsService
+    EnrollmentsService,
   ],
   exports: [
     CoursesService,
     TrainersService,
     TraineesService,
-    EnrollmentsService
-  ]
+    EnrollmentsService,
+  ],
 })
 export class TrainingModule {}
-
-
-

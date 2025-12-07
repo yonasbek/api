@@ -13,4 +13,4 @@ import { Document } from '../documents/entities/document.entity';
   controllers: [ReportsController],
   providers: [ReportsService],
 })
-export class ReportsModule {} 
+export class ReportsModule {}

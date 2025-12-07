@@ -12,14 +12,14 @@ export enum PlanType {
   ECCD = 'ECCD',
   HDD = 'HDD',
   SRD = 'SRD',
-  LEO = 'LEO'
+  LEO = 'LEO',
 }
 
 export enum ActivityStatus {
   NOT_STARTED = 'NOT_STARTED',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
-  DELAYED = 'DELAYED'
+  DELAYED = 'DELAYED',
 }
 
 @Entity('activities')
@@ -27,7 +27,7 @@ export class Activity extends BaseEntity {
   @ApiProperty({ enum: PlanType, example: PlanType.PFRD })
   @Column({
     type: 'enum',
-    enum: PlanType
+    enum: PlanType,
   })
   plan_type: PlanType;
 
@@ -39,7 +39,9 @@ export class Activity extends BaseEntity {
   @Column()
   title: string;
 
-  @ApiProperty({ example: 'Improve patient experience and reduce waiting times' })
+  @ApiProperty({
+    example: 'Improve patient experience and reduce waiting times',
+  })
   @Column()
   strategic_objective: string;
 
@@ -63,7 +65,7 @@ export class Activity extends BaseEntity {
   @Column('int', { default: 0 })
   budget_allocated: number;
 
-  @ApiProperty({ example: 0})
+  @ApiProperty({ example: 0 })
   @Column('int', { default: 0 })
   budget_spent: number;
 
@@ -71,7 +73,7 @@ export class Activity extends BaseEntity {
   @Column({
     type: 'enum',
     enum: ActivityStatus,
-    default: ActivityStatus.NOT_STARTED
+    default: ActivityStatus.NOT_STARTED,
   })
   status: ActivityStatus;
 
@@ -87,21 +89,21 @@ export class Activity extends BaseEntity {
   @Column('simple-array', { nullable: true })
   supporting_documents: string[];
 
-  @ManyToOne(() => Plan, plan => plan.activities)
+  @ManyToOne(() => Plan, (plan) => plan.activities)
   plan: Plan;
 
   @Column()
   plan_id: string;
 
-  @OneToMany(() => ActivityComment, comment => comment.activity)
+  @OneToMany(() => ActivityComment, (comment) => comment.activity)
   comments: ActivityComment[];
 
-  @OneToMany(() => ActivityAttachment, attachment => attachment.activity)
+  @OneToMany(() => ActivityAttachment, (attachment) => attachment.activity)
   attachments: ActivityAttachment[];
 
-  @OneToMany(() => Reminder, reminder => reminder.activity)
+  @OneToMany(() => Reminder, (reminder) => reminder.activity)
   reminders: Reminder[];
 
-  @OneToMany(() => SubActivity, subactivity => subactivity.activity)
+  @OneToMany(() => SubActivity, (subactivity) => subactivity.activity)
   subactivities: SubActivity[];
-} 
+}

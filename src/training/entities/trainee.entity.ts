@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
 import { CourseEnrollment } from './course-enrollment.entity';
 
 @Entity('trainees')
@@ -24,7 +31,6 @@ export class Trainee {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => CourseEnrollment, enrollment => enrollment.trainee)
+  @OneToMany(() => CourseEnrollment, (enrollment) => enrollment.trainee)
   enrollments: CourseEnrollment[];
 }
-

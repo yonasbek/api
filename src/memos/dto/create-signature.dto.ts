@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export enum SignatureAction {
   APPROVE = 'APPROVE',
-  REJECT = 'REJECT'
+  REJECT = 'REJECT',
 }
 
 export class CreateSignatureDto {
@@ -29,4 +29,4 @@ export class CreateSignatureDto {
 
   // This will be set by the controller
   memoId?: string;
-} 
+}

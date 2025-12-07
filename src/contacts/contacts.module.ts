@@ -12,4 +12,4 @@ import { User } from '../users/entities/user.entity';
   providers: [ContactsService],
   exports: [ContactsService],
 })
-export class ContactsModule {} 
+export class ContactsModule {}

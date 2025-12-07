@@ -1,4 +1,12 @@
-import { IsString, IsNotEmpty, IsNumber, IsEnum, IsOptional, ValidateNested, IsArray } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsEnum,
+  IsOptional,
+  ValidateNested,
+  IsArray,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { RoomStatus } from '../entities/room.entity';
@@ -57,4 +65,4 @@ export class CreateRoomDto {
   @IsString()
   @IsOptional()
   image?: string;
-} 
+}

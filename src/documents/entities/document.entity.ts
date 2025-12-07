@@ -1,4 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Comment } from './comment.entity';
 import { Tag } from './tag.entity';
@@ -46,14 +56,14 @@ export class Document {
   @ApiProperty({ example: 'John Doe' })
   originalName: string;
 
-  @OneToMany(() => Comment, comment => comment.document)
+  @OneToMany(() => Comment, (comment) => comment.document)
   comments: Comment[];
 
   @ManyToMany(() => Tag)
   @JoinTable({
     name: 'document_tags',
     joinColumn: { name: 'document_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' }
+    inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' },
   })
   tags: Tag[];
 
@@ -64,4 +74,4 @@ export class Document {
   @UpdateDateColumn()
   @ApiProperty({ example: '2024-01-01T12:00:00' })
   updatedAt: Date;
-} 
+}

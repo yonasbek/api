@@ -33,7 +33,7 @@ export class MemoSignature extends BaseEntity {
   @Column('timestamp with time zone')
   signed_at: Date;
 
-  @ManyToOne(() => Memo, memo => memo.signatures)
+  @ManyToOne(() => Memo, (memo) => memo.signatures)
   @JoinColumn({ name: 'memo_id' })
   memo: Memo;
-} 
+}

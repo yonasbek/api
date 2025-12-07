@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Course } from './course.entity';
 import { Trainee } from './trainee.entity';
 
@@ -8,7 +16,7 @@ export enum EnrollmentStatus {
   IN_PROGRESS = 'in_progress',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
-  FAILED = 'failed'
+  FAILED = 'failed',
 }
 
 @Entity('course_enrollments')
@@ -22,7 +30,11 @@ export class CourseEnrollment {
   @Column({ type: 'uuid' })
   trainee_id: string;
 
-  @Column({ type: 'enum', enum: EnrollmentStatus, default: EnrollmentStatus.PENDING })
+  @Column({
+    type: 'enum',
+    enum: EnrollmentStatus,
+    default: EnrollmentStatus.PENDING,
+  })
   status: EnrollmentStatus;
 
   @Column({ type: 'timestamp', nullable: true })
@@ -79,14 +91,11 @@ export class CourseEnrollment {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => Course, course => course.enrollments)
+  @ManyToOne(() => Course, (course) => course.enrollments)
   @JoinColumn({ name: 'course_id' })
   course: Course;
 
-  @ManyToOne(() => Trainee, trainee => trainee.enrollments)
+  @ManyToOne(() => Trainee, (trainee) => trainee.enrollments)
   @JoinColumn({ name: 'trainee_id' })
   trainee: Trainee;
 }
-
-
-

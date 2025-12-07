@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Article } from './article.entity';
 
 @Entity('tags')
@@ -15,7 +22,7 @@ export class Tag {
   @Column({ default: 0 })
   articleCount: number;
 
-  @ManyToMany(() => Article, article => article.tags)
+  @ManyToMany(() => Article, (article) => article.tags)
   articles: Article[];
 
   @CreateDateColumn()
@@ -23,4 +30,4 @@ export class Tag {
 
   @UpdateDateColumn()
   updatedAt: Date;
-} 
+}

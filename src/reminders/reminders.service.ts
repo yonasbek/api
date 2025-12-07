@@ -39,7 +39,10 @@ export class RemindersService {
     return reminder;
   }
 
-  async update(id: string, updateReminderDto: UpdateReminderDto): Promise<Reminder> {
+  async update(
+    id: string,
+    updateReminderDto: UpdateReminderDto,
+  ): Promise<Reminder> {
     const reminder = await this.findOne(id);
     Object.assign(reminder, updateReminderDto);
     return await this.reminderRepository.save(reminder);
@@ -99,4 +102,4 @@ export class RemindersService {
       },
     });
   }
-} 
+}

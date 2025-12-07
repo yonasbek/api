@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Attendance, AttendanceStatus } from './entities/attendance.entity';
@@ -18,8 +22,18 @@ export class AttendanceService {
       where: {
         user_id: createAttendanceDto.user_id,
         date: Between(
-          new Date(new Date(createAttendanceDto?.check_in?.timestamp || new Date().toISOString()).setHours(0,0,0,0)),
-          new Date(new Date(createAttendanceDto?.check_in?.timestamp || new Date().toISOString()).setHours(23,59,59,999))
+          new Date(
+            new Date(
+              createAttendanceDto?.check_in?.timestamp ||
+                new Date().toISOString(),
+            ).setHours(0, 0, 0, 0),
+          ),
+          new Date(
+            new Date(
+              createAttendanceDto?.check_in?.timestamp ||
+                new Date().toISOString(),
+            ).setHours(23, 59, 59, 999),
+          ),
         ),
       },
     });
@@ -30,7 +44,9 @@ export class AttendanceService {
 
     const attendance = this.attendanceRepository.create({
       ...createAttendanceDto,
-      date: new Date(createAttendanceDto?.check_in?.timestamp || new Date().toISOString()),
+      date: new Date(
+        createAttendanceDto?.check_in?.timestamp || new Date().toISOString(),
+      ),
       work_hours: 0,
       is_late: false,
     });
@@ -38,12 +54,14 @@ export class AttendanceService {
     return await this.attendanceRepository.save(attendance);
   }
 
-  async findAll(filters: {
-    user_id?: string;
-    start_date?: Date;
-    end_date?: Date;
-    status?: AttendanceStatus;
-  } = {}): Promise<Attendance[]> {
+  async findAll(
+    filters: {
+      user_id?: string;
+      start_date?: Date;
+      end_date?: Date;
+      status?: AttendanceStatus;
+    } = {},
+  ): Promise<Attendance[]> {
     const where: any = {};
 
     if (filters.user_id) {
@@ -78,26 +96,37 @@ export class AttendanceService {
     return attendance;
   }
 
-  async update(id: string, updateAttendanceDto: UpdateAttendanceDto): Promise<Attendance> {
+  async update(
+    id: string,
+    updateAttendanceDto: UpdateAttendanceDto,
+  ): Promise<Attendance> {
     const attendance = await this.findOne(id);
-    
+
     Object.assign(attendance, updateAttendanceDto);
 
     // Calculate work hours if both check-in and check-out exist
-    if (attendance.check_in && attendance.check_out && attendance.check_out.timestamp) {
+    if (
+      attendance.check_in &&
+      attendance.check_out &&
+      attendance.check_out.timestamp
+    ) {
       // Ensure timestamps are Date objects before calculation
       const checkInTime = new Date(attendance.check_in.timestamp);
       const checkOutTime = new Date(attendance.check_out.timestamp);
-      
-      const hours = (checkOutTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60);
+
+      const hours =
+        (checkOutTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60);
       attendance.work_hours = Number(hours.toFixed(2));
     }
 
     // Update late status based on check-in time
     if (attendance.check_in) {
       const checkInHour = new Date(attendance.check_in.timestamp).getHours();
-      const checkInMinutes = new Date(attendance.check_in.timestamp).getMinutes();
-      attendance.is_late = checkInHour > 9 || (checkInHour === 9 && checkInMinutes > 0);
+      const checkInMinutes = new Date(
+        attendance.check_in.timestamp,
+      ).getMinutes();
+      attendance.is_late =
+        checkInHour > 9 || (checkInHour === 9 && checkInMinutes > 0);
     }
 
     return await this.attendanceRepository.save(attendance);
@@ -132,7 +161,7 @@ export class AttendanceService {
 
   async getStatistics(startDate: Date, endDate: Date) {
     const attendances = await this.findByDateRange(startDate, endDate);
-    
+
     const statistics = {
       totalAttendances: attendances.length,
       presentCount: 0,
@@ -145,7 +174,7 @@ export class AttendanceService {
     let totalWorkingHours = 0;
     let recordsWithWorkingHours = 0;
 
-    attendances.forEach(attendance => {
+    attendances.forEach((attendance) => {
       switch (attendance.status) {
         case AttendanceStatus.PRESENT:
           statistics.presentCount++;
@@ -162,14 +191,19 @@ export class AttendanceService {
       }
 
       if (attendance.check_in && attendance.check_out) {
-        const hours = (attendance.check_out.timestamp.getTime() - attendance.check_in.timestamp.getTime()) / (1000 * 60 * 60);
+        const hours =
+          (attendance.check_out.timestamp.getTime() -
+            attendance.check_in.timestamp.getTime()) /
+          (1000 * 60 * 60);
         totalWorkingHours += hours;
         recordsWithWorkingHours++;
       }
     });
 
     if (recordsWithWorkingHours > 0) {
-      statistics.averageWorkingHours = Number((totalWorkingHours / recordsWithWorkingHours).toFixed(2));
+      statistics.averageWorkingHours = Number(
+        (totalWorkingHours / recordsWithWorkingHours).toFixed(2),
+      );
     }
 
     return statistics;
@@ -186,25 +220,28 @@ export class AttendanceService {
 
   async getStats(user_id?: string, start_date?: Date, end_date?: Date) {
     const where: any = {};
-    
+
     if (user_id) {
       where.user_id = user_id;
     }
-    
+
     if (start_date && end_date) {
       where.date = Between(start_date, end_date);
     }
 
     const attendances = await this.attendanceRepository.find({ where });
-    return this.getStatistics(start_date || new Date(0), end_date || new Date());
+    return this.getStatistics(
+      start_date || new Date(0),
+      end_date || new Date(),
+    );
   }
 
   async getMonthlyReport(year: number, month: number, userId?: string) {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0);
-    
+
     const where: any = {
-      date: Between(startDate, endDate)
+      date: Between(startDate, endDate),
     };
 
     if (userId) {
@@ -212,15 +249,22 @@ export class AttendanceService {
     }
 
     const attendances = await this.attendanceRepository.find({ where });
-    
+
     return {
       totalDays: endDate.getDate(),
       workingDays: attendances.length,
-      present: attendances.filter(a => a.status === AttendanceStatus.PRESENT).length,
-      absent: attendances.filter(a => a.status === AttendanceStatus.ABSENT).length,
-      late: attendances.filter(a => a.status === AttendanceStatus.LATE).length,
-      leave: attendances.filter(a => a.status === AttendanceStatus.LEAVE).length,
-      totalWorkHours: attendances.reduce((sum, a) => sum + (a.work_hours || 0), 0),
+      present: attendances.filter((a) => a.status === AttendanceStatus.PRESENT)
+        .length,
+      absent: attendances.filter((a) => a.status === AttendanceStatus.ABSENT)
+        .length,
+      late: attendances.filter((a) => a.status === AttendanceStatus.LATE)
+        .length,
+      leave: attendances.filter((a) => a.status === AttendanceStatus.LEAVE)
+        .length,
+      totalWorkHours: attendances.reduce(
+        (sum, a) => sum + (a.work_hours || 0),
+        0,
+      ),
     };
   }
 
@@ -243,16 +287,19 @@ export class AttendanceService {
     return await this.attendanceRepository.save(attendance);
   }
 
-  async bulkUpdate(ids: string[], updateDto: UpdateAttendanceDto): Promise<Attendance[]> {
+  async bulkUpdate(
+    ids: string[],
+    updateDto: UpdateAttendanceDto,
+  ): Promise<Attendance[]> {
     const attendances = await this.attendanceRepository.findByIds(ids);
     if (attendances.length !== ids.length) {
       throw new NotFoundException('Some attendance records were not found');
     }
 
-    const updatedAttendances = attendances.map(attendance => {
+    const updatedAttendances = attendances.map((attendance) => {
       return Object.assign(attendance, updateDto);
     });
 
     return await this.attendanceRepository.save(updatedAttendances);
   }
-} 
+}

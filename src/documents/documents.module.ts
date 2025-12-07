@@ -10,4 +10,4 @@ import { Document } from './entities/document.entity';
   providers: [DocumentsService],
   exports: [DocumentsService],
 })
-export class DocumentsModule {} 
+export class DocumentsModule {}

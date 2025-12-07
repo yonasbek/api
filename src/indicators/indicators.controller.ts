@@ -1,5 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { IndicatorsService } from './indicators.service';
 import { CreateIndicatorDto } from './dto/create-indicator.dto';
 import { UpdateIndicatorDto } from './dto/update-indicator.dto';
@@ -16,14 +31,24 @@ export class IndicatorsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new indicator' })
-  @ApiResponse({ status: 201, description: 'Indicator created successfully', type: Indicator })
-  async create(@Body() createIndicatorDto: CreateIndicatorDto): Promise<Indicator> {
+  @ApiResponse({
+    status: 201,
+    description: 'Indicator created successfully',
+    type: Indicator,
+  })
+  async create(
+    @Body() createIndicatorDto: CreateIndicatorDto,
+  ): Promise<Indicator> {
     return await this.indicatorsService.create(createIndicatorDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all indicators' })
-  @ApiResponse({ status: 200, description: 'Return all indicators', type: [Indicator] })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all indicators',
+    type: [Indicator],
+  })
   async findAll(@Query('category') category?: string): Promise<Indicator[]> {
     if (category) {
       return await this.indicatorsService.findByCategory(category);
@@ -51,12 +76,20 @@ export class IndicatorsController {
     @Query('start_date') startDate: string,
     @Query('end_date') endDate: string,
   ): Promise<any[]> {
-    return await this.indicatorsService.getHistoricalTrend(id, new Date(startDate), new Date(endDate));
+    return await this.indicatorsService.getHistoricalTrend(
+      id,
+      new Date(startDate),
+      new Date(endDate),
+    );
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get an indicator by id' })
-  @ApiResponse({ status: 200, description: 'Return an indicator', type: Indicator })
+  @ApiResponse({
+    status: 200,
+    description: 'Return an indicator',
+    type: Indicator,
+  })
   @ApiResponse({ status: 404, description: 'Indicator not found' })
   async findOne(@Param('id') id: string): Promise<Indicator> {
     return await this.indicatorsService.findOne(id);
@@ -64,7 +97,11 @@ export class IndicatorsController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update an indicator' })
-  @ApiResponse({ status: 200, description: 'Indicator updated successfully', type: Indicator })
+  @ApiResponse({
+    status: 200,
+    description: 'Indicator updated successfully',
+    type: Indicator,
+  })
   @ApiResponse({ status: 404, description: 'Indicator not found' })
   async update(
     @Param('id') id: string,
@@ -80,4 +117,4 @@ export class IndicatorsController {
   async remove(@Param('id') id: string): Promise<void> {
     return await this.indicatorsService.remove(id);
   }
-} 
+}

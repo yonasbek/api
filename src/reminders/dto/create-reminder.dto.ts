@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsDate, IsUUID, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsDate,
+  IsUUID,
+  IsBoolean,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -20,4 +26,4 @@ export class CreateReminderDto {
   @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
   @IsUUID()
   activity_id: string;
-} 
+}

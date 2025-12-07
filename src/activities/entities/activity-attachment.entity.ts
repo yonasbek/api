@@ -19,7 +19,7 @@ export class ActivityAttachment extends BaseEntity {
   @Column()
   activity_id: string;
 
-  @ManyToOne(() => Activity, activity => activity.attachments)
+  @ManyToOne(() => Activity, (activity) => activity.attachments)
   @JoinColumn({ name: 'activity_id' })
   activity: Activity;
-} 
+}

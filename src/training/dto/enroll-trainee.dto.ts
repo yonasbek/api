@@ -1,4 +1,10 @@
-import { IsString, IsOptional, IsBoolean, IsNumber, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsBoolean,
+  IsNumber,
+  IsDateString,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class EnrollTraineeDto {
@@ -10,7 +16,10 @@ export class EnrollTraineeDto {
   @IsString()
   trainee_id: string;
 
-  @ApiPropertyOptional({ description: 'Whether attendance is required', default: false })
+  @ApiPropertyOptional({
+    description: 'Whether attendance is required',
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   attendance_required?: boolean;
@@ -19,7 +28,10 @@ export class EnrollTraineeDto {
   @IsOptional()
   total_sessions?: number;
 
-  @ApiPropertyOptional({ description: 'Whether payment is required', default: false })
+  @ApiPropertyOptional({
+    description: 'Whether payment is required',
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   payment_required?: boolean;
@@ -29,7 +41,10 @@ export class EnrollTraineeDto {
   @IsNumber()
   amount_paid?: number;
 
-  @ApiPropertyOptional({ description: 'Payment method', example: 'Credit Card' })
+  @ApiPropertyOptional({
+    description: 'Payment method',
+    example: 'Credit Card',
+  })
   @IsOptional()
   @IsString()
   payment_method?: string;

@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
 import { User } from './user.entity';
 
 @Entity('departments')
@@ -15,7 +22,7 @@ export class Department {
   @Column({ nullable: true })
   location: string;
 
-  @OneToMany(() => User, user => user.department)
+  @OneToMany(() => User, (user) => user.department)
   users: User[];
 
   @CreateDateColumn()
@@ -23,4 +30,4 @@ export class Department {
 
   @UpdateDateColumn()
   updatedAt: Date;
-} 
+}

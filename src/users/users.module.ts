@@ -12,4 +12,4 @@ import { Department } from './entities/department.entity';
   controllers: [UsersController, RolesController, DepartmentsController],
   exports: [TypeOrmModule],
 })
-export class UsersModule {} 
+export class UsersModule {}

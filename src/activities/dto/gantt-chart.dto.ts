@@ -12,4 +12,4 @@ export class GanttChartItemDto {
   assigned_to: string;
   status: ActivityStatus;
   budget: number;
-} 
+}

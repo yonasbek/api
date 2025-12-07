@@ -11,4 +11,4 @@ import { Booking } from './entities/booking.entity';
   providers: [RoomsService],
   exports: [RoomsService],
 })
-export class RoomsModule {} 
+export class RoomsModule {}

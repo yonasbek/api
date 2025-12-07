@@ -16,7 +16,9 @@ export class ImportResponseDto {
   @ApiProperty({ example: 5 })
   totalColumns: number;
 
-  @ApiProperty({ example: '["name", "email", "department", "salary", "hire_date"]' })
+  @ApiProperty({
+    example: '["name", "email", "department", "salary", "hire_date"]',
+  })
   headers: string[];
 
   @ApiProperty({ example: 'SUCCESS' })

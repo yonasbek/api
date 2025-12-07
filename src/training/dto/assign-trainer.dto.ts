@@ -6,11 +6,11 @@ export class AssignTrainerDto {
   @IsString()
   course_id: string;
 
-  @ApiProperty({ description: 'Array of trainer IDs to assign', type: [String] })
+  @ApiProperty({
+    description: 'Array of trainer IDs to assign',
+    type: [String],
+  })
   @IsArray()
   @IsString({ each: true })
   trainer_ids: string[];
 }
-
-
-

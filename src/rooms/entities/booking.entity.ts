@@ -6,19 +6,18 @@ import { ApiProperty } from '@nestjs/swagger';
 export enum AttendeeStatus {
   PENDING = 'pending',
   ACCEPTED = 'accepted',
-  DECLINED = 'declined'
+  DECLINED = 'declined',
 }
 
 @Entity('bookings')
 export class Booking extends BaseEntity {
-  @ManyToOne(() => Room, room => room.bookings)
+  @ManyToOne(() => Room, (room) => room.bookings)
   @JoinColumn({ name: 'room_id' })
   room: Room;
 
   @ApiProperty({ example: 'room-123' })
   @Column()
   room_id: string;
-
 
   @ApiProperty({ example: 'Team Planning Meeting' })
   @Column()
@@ -42,9 +41,9 @@ export class Booking extends BaseEntity {
         id: 'user-123',
         name: 'John Doe',
         email: 'john@example.com',
-        status: 'pending'
-      }
-    ]
+        status: 'pending',
+      },
+    ],
   })
   @Column('json', { default: [] })
   attendees: Array<{
@@ -62,9 +61,9 @@ export class Booking extends BaseEntity {
     example: {
       frequency: 'weekly',
       interval: 1,
-      endDate: '2024-12-31T00:00:00Z'
+      endDate: '2024-12-31T00:00:00Z',
     },
-    nullable: true
+    nullable: true,
   })
   @Column('json', { nullable: true })
   recurring_pattern: {
@@ -78,9 +77,9 @@ export class Booking extends BaseEntity {
       {
         id: 'resource-123',
         name: 'Projector',
-        quantity: 1
-      }
-    ]
+        quantity: 1,
+      },
+    ],
   })
   @Column('json', { default: [] })
   resources: Array<{
@@ -88,4 +87,4 @@ export class Booking extends BaseEntity {
     name: string;
     quantity: number;
   }>;
-} 
+}

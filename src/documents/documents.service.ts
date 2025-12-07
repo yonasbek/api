@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { createWriteStream, unlink } from 'fs';
@@ -20,7 +24,10 @@ export class DocumentsService {
     private readonly documentRepository: Repository<Document>,
   ) {}
 
-  async create(file: Express.Multer.File, createDocumentDto: CreateDocumentDto): Promise<Document> {
+  async create(
+    file: Express.Multer.File,
+    createDocumentDto: CreateDocumentDto,
+  ): Promise<Document> {
     if (!file) {
       throw new BadRequestException('File is required');
     }
@@ -34,7 +41,7 @@ export class DocumentsService {
       writeStream.write(file.buffer);
       writeStream.end();
       writeStream.on('finish', () => resolve());
-      writeStream.on('error', error => reject(error));
+      writeStream.on('error', (error) => reject(error));
     });
 
     // Create document record
@@ -80,7 +87,9 @@ export class DocumentsService {
     return document;
   }
 
-  async download(id: string): Promise<{ path: string; originalName: string; mimeType: string }> {
+  async download(
+    id: string,
+  ): Promise<{ path: string; originalName: string; mimeType: string }> {
     const document = await this.findOne(id);
     return {
       path: document.path,
@@ -89,7 +98,10 @@ export class DocumentsService {
     };
   }
 
-  async update(id: string, updateDocumentDto: UpdateDocumentDto): Promise<Document> {
+  async update(
+    id: string,
+    updateDocumentDto: UpdateDocumentDto,
+  ): Promise<Document> {
     const document = await this.findOne(id);
     Object.assign(document, updateDocumentDto);
     return await this.documentRepository.save(document);
@@ -97,7 +109,7 @@ export class DocumentsService {
 
   async remove(id: string): Promise<void> {
     const document = await this.findOne(id);
-    
+
     // Delete file from disk
     try {
       await unlinkAsync(document.path);
@@ -110,4 +122,4 @@ export class DocumentsService {
       throw new NotFoundException(`Document with ID ${id} not found`);
     }
   }
-} 
+}

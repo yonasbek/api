@@ -25,22 +25,26 @@ export class UploadService {
     }
   }
 
-  async uploadFiles(files: Express.Multer.File[], module: Module): Promise<string[]> {
+  async uploadFiles(
+    files: Express.Multer.File[],
+    module: Module,
+  ): Promise<string[]> {
     if (!files || files.length === 0) {
       throw new BadRequestException('No files provided');
     }
 
-
-
     const savedFiles: string[] = [];
 
     for (const file of files) {
-
-
       const fileExt = file.originalname;
       const fileName = `${uuidv4()}-${file.originalname}`;
       const filePath = path.join(this.uploadDir, fileName);
-      console.log(`Saving file to ${filePath}`, file.originalname, file.mimetype, file.buffer);
+      console.log(
+        `Saving file to ${filePath}`,
+        file.originalname,
+        file.mimetype,
+        file.buffer,
+      );
       try {
         await fs.writeFile(filePath, file.buffer);
         const upload = new Uploads();
@@ -54,7 +58,9 @@ export class UploadService {
         savedFiles.push(fileName);
       } catch (error) {
         console.log(`Failed to save file ${file.originalname}:`, error);
-        throw new BadRequestException(`Failed to save file ${file.originalname}`);
+        throw new BadRequestException(
+          `Failed to save file ${file.originalname}`,
+        );
       }
     }
 
@@ -74,7 +80,11 @@ export class UploadService {
   }
 
   async getFilePath(fileName: string): Promise<string> {
-    const filePath = path.join('http://localhost:3000/',this.uploadDir, fileName);
+    const filePath = path.join(
+      'http://localhost:3000/',
+      this.uploadDir,
+      fileName,
+    );
     try {
       await fs.access(filePath);
       return filePath;
@@ -96,4 +106,4 @@ export class UploadService {
   async deleteFile(id: string): Promise<void> {
     await this.uploadRepository.delete(id);
   }
-} 
+}

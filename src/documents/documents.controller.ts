@@ -1,6 +1,25 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  Query,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiBody,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { DocumentsService } from './documents.service';
 import { CreateDocumentDto } from './dto/create-document.dto';
@@ -33,7 +52,10 @@ export class DocumentsController {
       },
     },
   })
-  async create(@UploadedFile() file: Express.Multer.File, @Body() createDocumentDto: CreateDocumentDto): Promise<import('./entities/document.entity').Document> {
+  async create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createDocumentDto: CreateDocumentDto,
+  ): Promise<import('./entities/document.entity').Document> {
     return await this.documentsService.create(file, createDocumentDto);
   }
 
@@ -68,7 +90,10 @@ export class DocumentsController {
   @Put(':id')
   @ApiOperation({ summary: 'Update document metadata' })
   @ApiResponse({ status: 200, description: 'Document updated successfully' })
-  update(@Param('id') id: string, @Body() updateDocumentDto: UpdateDocumentDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateDocumentDto: UpdateDocumentDto,
+  ) {
     return this.documentsService.update(id, updateDocumentDto);
   }
 
@@ -78,4 +103,4 @@ export class DocumentsController {
   remove(@Param('id') id: string) {
     return this.documentsService.remove(id);
   }
-} 
+}

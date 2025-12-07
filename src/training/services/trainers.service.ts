@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Trainer } from '../entities/trainer.entity';
@@ -18,11 +22,13 @@ export class TrainersService {
   async create(createTrainerDto: CreateTrainerDto): Promise<Trainer> {
     // Check if email already exists
     const existingTrainer = await this.trainerRepository.findOne({
-      where: { email: createTrainerDto.email }
+      where: { email: createTrainerDto.email },
     });
 
     if (existingTrainer) {
-      throw new BadRequestException(`Trainer with email ${createTrainerDto.email} already exists`);
+      throw new BadRequestException(
+        `Trainer with email ${createTrainerDto.email} already exists`,
+      );
     }
 
     const trainer = this.trainerRepository.create(createTrainerDto);
@@ -32,14 +38,14 @@ export class TrainersService {
   async findAll(): Promise<Trainer[]> {
     return await this.trainerRepository.find({
       relations: ['courses'],
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     });
   }
 
   async findOne(id: string): Promise<Trainer> {
     const trainer = await this.trainerRepository.findOne({
       where: { id },
-      relations: ['courses']
+      relations: ['courses'],
     });
 
     if (!trainer) {
@@ -49,17 +55,22 @@ export class TrainersService {
     return trainer;
   }
 
-  async update(id: string, updateTrainerDto: UpdateTrainerDto): Promise<Trainer> {
+  async update(
+    id: string,
+    updateTrainerDto: UpdateTrainerDto,
+  ): Promise<Trainer> {
     const trainer = await this.findOne(id);
 
     // Check if email is being changed and if it already exists
     if (updateTrainerDto.email && updateTrainerDto.email !== trainer.email) {
       const existingTrainer = await this.trainerRepository.findOne({
-        where: { email: updateTrainerDto.email }
+        where: { email: updateTrainerDto.email },
       });
 
       if (existingTrainer) {
-        throw new BadRequestException(`Trainer with email ${updateTrainerDto.email} already exists`);
+        throw new BadRequestException(
+          `Trainer with email ${updateTrainerDto.email} already exists`,
+        );
       }
     }
 
@@ -72,12 +83,13 @@ export class TrainersService {
 
     // Check if trainer has assigned courses
     if (trainer.courses && trainer.courses.length > 0) {
-      throw new BadRequestException('Cannot delete trainer with assigned courses');
+      throw new BadRequestException(
+        'Cannot delete trainer with assigned courses',
+      );
     }
 
     await this.trainerRepository.remove(trainer);
   }
-
 
   async getTrainerStats(id: string): Promise<{
     total_courses: number;
@@ -90,25 +102,26 @@ export class TrainersService {
     const courses = trainer.courses || [];
 
     const total_courses = courses.length;
-    const active_courses = courses.filter(c => c.is_active).length;
+    const active_courses = courses.filter((c) => c.is_active).length;
     const completed_courses = 0; // Simplified - no status tracking
 
     // Get total trainees across all courses
-    const courseIds = courses.map(c => c.id);
-    const total_trainees = courseIds.length > 0 
-      ? await this.courseRepository
-          .createQueryBuilder('course')
-          .leftJoin('course.enrollments', 'enrollment')
-          .where('course.id IN (:...courseIds)', { courseIds })
-          .getCount()
-      : 0;
+    const courseIds = courses.map((c) => c.id);
+    const total_trainees =
+      courseIds.length > 0
+        ? await this.courseRepository
+            .createQueryBuilder('course')
+            .leftJoin('course.enrollments', 'enrollment')
+            .where('course.id IN (:...courseIds)', { courseIds })
+            .getCount()
+        : 0;
 
     return {
       total_courses,
       active_courses,
       completed_courses,
       total_trainees,
-      average_rating: 0 // This would need to be implemented based on feedback/rating system
+      average_rating: 0, // This would need to be implemented based on feedback/rating system
     };
   }
 
@@ -117,7 +130,7 @@ export class TrainersService {
       .createQueryBuilder('trainer')
       .leftJoinAndSelect('trainer.courses', 'courses')
       .where('trainer.name ILIKE :query OR trainer.email ILIKE :query', {
-        query: `%${query}%`
+        query: `%${query}%`,
       })
       .orderBy('trainer.createdAt', 'DESC')
       .getMany();
@@ -131,10 +144,12 @@ export class TrainersService {
 
     if (courseId) {
       // Exclude trainers already assigned to this course
-      query.andWhere('trainer.id NOT IN (SELECT trainer_id FROM course_trainers WHERE course_id = :courseId)', { courseId });
+      query.andWhere(
+        'trainer.id NOT IN (SELECT trainer_id FROM course_trainers WHERE course_id = :courseId)',
+        { courseId },
+      );
     }
 
     return await query.orderBy('trainer.createdAt', 'DESC').getMany();
   }
 }
-

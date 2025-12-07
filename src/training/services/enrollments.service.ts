@@ -1,7 +1,14 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CourseEnrollment, EnrollmentStatus } from '../entities/course-enrollment.entity';
+import {
+  CourseEnrollment,
+  EnrollmentStatus,
+} from '../entities/course-enrollment.entity';
 import { Course } from '../entities/course.entity';
 import { Trainee } from '../entities/trainee.entity';
 import { EnrollTraineeDto } from '../dto/enroll-trainee.dto';
@@ -18,14 +25,18 @@ export class EnrollmentsService {
     private traineeRepository: Repository<Trainee>,
   ) {}
 
-  async enrollTrainee(enrollTraineeDto: EnrollTraineeDto): Promise<CourseEnrollment> {
+  async enrollTrainee(
+    enrollTraineeDto: EnrollTraineeDto,
+  ): Promise<CourseEnrollment> {
     // Check if course exists and is available for enrollment
     const course = await this.courseRepository.findOne({
-      where: { id: enrollTraineeDto.course_id }
+      where: { id: enrollTraineeDto.course_id },
     });
 
     if (!course) {
-      throw new NotFoundException(`Course with ID ${enrollTraineeDto.course_id} not found`);
+      throw new NotFoundException(
+        `Course with ID ${enrollTraineeDto.course_id} not found`,
+      );
     }
 
     if (!course.is_active) {
@@ -38,11 +49,13 @@ export class EnrollmentsService {
 
     // Check if trainee exists
     const trainee = await this.traineeRepository.findOne({
-      where: { id: enrollTraineeDto.trainee_id }
+      where: { id: enrollTraineeDto.trainee_id },
     });
 
     if (!trainee) {
-      throw new NotFoundException(`Trainee with ID ${enrollTraineeDto.trainee_id} not found`);
+      throw new NotFoundException(
+        `Trainee with ID ${enrollTraineeDto.trainee_id} not found`,
+      );
     }
 
     if (!trainee.is_active) {
@@ -53,17 +66,19 @@ export class EnrollmentsService {
     const existingEnrollment = await this.enrollmentRepository.findOne({
       where: {
         course_id: enrollTraineeDto.course_id,
-        trainee_id: enrollTraineeDto.trainee_id
-      }
+        trainee_id: enrollTraineeDto.trainee_id,
+      },
     });
 
     if (existingEnrollment) {
-      throw new BadRequestException('Trainee is already enrolled in this course');
+      throw new BadRequestException(
+        'Trainee is already enrolled in this course',
+      );
     }
 
     // Check course capacity
     const currentEnrollments = await this.enrollmentRepository.count({
-      where: { course_id: enrollTraineeDto.course_id }
+      where: { course_id: enrollTraineeDto.course_id },
     });
 
     // if (course.max_participants > 0 && currentEnrollments >= course.max_participants) {
@@ -86,7 +101,7 @@ export class EnrollmentsService {
       amount_paid: enrollTraineeDto.amount_paid || undefined,
       payment_method: enrollTraineeDto.payment_method || undefined,
       payment_reference: enrollTraineeDto.payment_reference || undefined,
-      notes: enrollTraineeDto.notes || undefined
+      notes: enrollTraineeDto.notes || undefined,
     };
 
     const enrollment = this.enrollmentRepository.create(enrollmentData);
@@ -97,14 +112,14 @@ export class EnrollmentsService {
   async findAll(): Promise<CourseEnrollment[]> {
     return await this.enrollmentRepository.find({
       relations: ['course', 'trainee'],
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     });
   }
 
   async findOne(id: string): Promise<CourseEnrollment> {
     const enrollment = await this.enrollmentRepository.findOne({
       where: { id },
-      relations: ['course', 'trainee']
+      relations: ['course', 'trainee'],
     });
 
     if (!enrollment) {
@@ -114,28 +129,47 @@ export class EnrollmentsService {
     return enrollment;
   }
 
-  async update(id: string, updateEnrollmentDto: UpdateEnrollmentDto): Promise<CourseEnrollment> {
+  async update(
+    id: string,
+    updateEnrollmentDto: UpdateEnrollmentDto,
+  ): Promise<CourseEnrollment> {
     const enrollment = await this.findOne(id);
 
     // Validate progress percentage
     if (updateEnrollmentDto.progress_percentage !== undefined) {
-      if (updateEnrollmentDto.progress_percentage < 0 || updateEnrollmentDto.progress_percentage > 100) {
-        throw new BadRequestException('Progress percentage must be between 0 and 100');
+      if (
+        updateEnrollmentDto.progress_percentage < 0 ||
+        updateEnrollmentDto.progress_percentage > 100
+      ) {
+        throw new BadRequestException(
+          'Progress percentage must be between 0 and 100',
+        );
       }
     }
 
     // Validate final grade
     if (updateEnrollmentDto.final_grade !== undefined) {
-      if (updateEnrollmentDto.final_grade < 0 || updateEnrollmentDto.final_grade > 100) {
+      if (
+        updateEnrollmentDto.final_grade < 0 ||
+        updateEnrollmentDto.final_grade > 100
+      ) {
         throw new BadRequestException('Final grade must be between 0 and 100');
       }
     }
 
     // Auto-update status based on progress
-    if (updateEnrollmentDto.progress_percentage !== undefined && updateEnrollmentDto.progress_percentage === 100 && enrollment.status !== 'completed') {
+    if (
+      updateEnrollmentDto.progress_percentage !== undefined &&
+      updateEnrollmentDto.progress_percentage === 100 &&
+      enrollment.status !== 'completed'
+    ) {
       updateEnrollmentDto.status = EnrollmentStatus.COMPLETED;
       updateEnrollmentDto.completed_at = new Date();
-    } else if (updateEnrollmentDto.progress_percentage !== undefined && updateEnrollmentDto.progress_percentage > 0 && enrollment.status === 'pending') {
+    } else if (
+      updateEnrollmentDto.progress_percentage !== undefined &&
+      updateEnrollmentDto.progress_percentage > 0 &&
+      enrollment.status === 'pending'
+    ) {
       updateEnrollmentDto.status = EnrollmentStatus.IN_PROGRESS;
       if (!enrollment.started_at) {
         updateEnrollmentDto.started_at = new Date();
@@ -161,7 +195,7 @@ export class EnrollmentsService {
     return await this.enrollmentRepository.find({
       where: { course_id: courseId },
       relations: ['trainee'],
-      order: { enrolled_at: 'DESC' }
+      order: { enrolled_at: 'DESC' },
     });
   }
 
@@ -169,7 +203,7 @@ export class EnrollmentsService {
     return await this.enrollmentRepository.find({
       where: { trainee_id: traineeId },
       relations: ['course'],
-      order: { enrolled_at: 'DESC' }
+      order: { enrolled_at: 'DESC' },
     });
   }
 
@@ -177,7 +211,7 @@ export class EnrollmentsService {
     return await this.enrollmentRepository.find({
       where: { status },
       relations: ['course', 'trainee'],
-      order: { enrolled_at: 'DESC' }
+      order: { enrolled_at: 'DESC' },
     });
   }
 
@@ -193,13 +227,26 @@ export class EnrollmentsService {
     const enrollments = await this.enrollmentRepository.find();
 
     const total_enrollments = enrollments.length;
-    const pending_enrollments = enrollments.filter(e => e.status === 'pending').length;
-    const confirmed_enrollments = enrollments.filter(e => e.status === 'confirmed').length;
-    const in_progress_enrollments = enrollments.filter(e => e.status === 'in_progress').length;
-    const completed_enrollments = enrollments.filter(e => e.status === 'completed').length;
-    const cancelled_enrollments = enrollments.filter(e => e.status === 'cancelled').length;
+    const pending_enrollments = enrollments.filter(
+      (e) => e.status === 'pending',
+    ).length;
+    const confirmed_enrollments = enrollments.filter(
+      (e) => e.status === 'confirmed',
+    ).length;
+    const in_progress_enrollments = enrollments.filter(
+      (e) => e.status === 'in_progress',
+    ).length;
+    const completed_enrollments = enrollments.filter(
+      (e) => e.status === 'completed',
+    ).length;
+    const cancelled_enrollments = enrollments.filter(
+      (e) => e.status === 'cancelled',
+    ).length;
 
-    const completion_rate = total_enrollments > 0 ? (completed_enrollments / total_enrollments) * 100 : 0;
+    const completion_rate =
+      total_enrollments > 0
+        ? (completed_enrollments / total_enrollments) * 100
+        : 0;
 
     return {
       total_enrollments,
@@ -208,7 +255,7 @@ export class EnrollmentsService {
       in_progress_enrollments,
       completed_enrollments,
       cancelled_enrollments,
-      completion_rate
+      completion_rate,
     };
   }
 
@@ -216,7 +263,9 @@ export class EnrollmentsService {
     const enrollment = await this.findOne(id);
 
     if (enrollment.status !== 'pending') {
-      throw new BadRequestException('Only pending enrollments can be confirmed');
+      throw new BadRequestException(
+        'Only pending enrollments can be confirmed',
+      );
     }
 
     enrollment.status = EnrollmentStatus.CONFIRMED;

@@ -6,7 +6,7 @@ export enum WorkflowAction {
   SUBMIT_TO_LEO = 'SUBMIT_TO_LEO',
   APPROVE = 'APPROVE',
   RETURN_TO_CREATOR = 'RETURN_TO_CREATOR',
-  REJECT = 'REJECT'
+  REJECT = 'REJECT',
 }
 
 export class WorkflowActionDto {
@@ -15,7 +15,9 @@ export class WorkflowActionDto {
   @IsNotEmpty()
   action: WorkflowAction;
 
-  @ApiProperty({ example: 'This memo looks good, forwarding to LEO for final approval' })
+  @ApiProperty({
+    example: 'This memo looks good, forwarding to LEO for final approval',
+  })
   @IsString()
   @IsNotEmpty()
   comment: string;
@@ -31,4 +33,4 @@ export class GenerateDocumentDto {
   @IsString()
   @IsNotEmpty()
   memoId: string;
-} 
+}

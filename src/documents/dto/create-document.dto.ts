@@ -15,4 +15,4 @@ export class CreateDocumentDto {
   @IsString()
   @IsOptional()
   category?: string;
-} 
+}

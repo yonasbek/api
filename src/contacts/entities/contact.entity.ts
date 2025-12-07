@@ -17,7 +17,7 @@ export class Contact extends BaseEntity {
   @Column({
     type: 'enum',
     enum: ContactPosition,
-    default: ContactPosition.OTHER
+    default: ContactPosition.OTHER,
   })
   position: ContactPosition;
 
@@ -32,7 +32,7 @@ export class Contact extends BaseEntity {
   @ApiProperty({ enum: ContactType, example: ContactType.MOH_AGENCIES })
   @Column({
     type: 'enum',
-    enum: ContactType
+    enum: ContactType,
   })
   organizationType: ContactType;
 
@@ -52,7 +52,10 @@ export class Contact extends BaseEntity {
   @Column({ default: true })
   isActive: boolean;
 
-  @ApiProperty({ example: 'Additional notes about the contact', required: false })
+  @ApiProperty({
+    example: 'Additional notes about the contact',
+    required: false,
+  })
   @Column({ type: 'text', nullable: true })
   notes?: string;
 

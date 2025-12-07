@@ -1,19 +1,25 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Body, 
-  Patch, 
-  Param, 
-  Delete, 
-  Query, 
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
   UseGuards,
   Request,
   ParseIntPipe,
   ParseBoolPipe,
-  BadRequestException
+  BadRequestException,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { ContactsService, ContactSearchParams } from './contacts.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
@@ -40,24 +46,78 @@ export class ContactsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get contacts with advanced filtering and pagination' })
-  @ApiResponse({ status: 200, description: 'Return filtered contacts with pagination' })
-  @ApiQuery({ name: 'search', required: false, description: 'Search term for institution, individual, email, or phone' })
-  @ApiQuery({ name: 'organizationType', required: false, enum: ContactType, description: 'Filter by organization type' })
-  @ApiQuery({ name: 'position', required: false, enum: ContactPosition, description: 'Filter by position' })
-  @ApiQuery({ name: 'region', required: false, description: 'Filter by region' })
-  @ApiQuery({ name: 'isActive', required: false, type: Boolean, description: 'Filter by active status' })
-  @ApiQuery({ name: 'sortBy', required: false, enum: ['instituteName', 'individualName', 'organizationType', 'created_at'], description: 'Sort field' })
-  @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'], description: 'Sort order' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 50)' })
+  @ApiOperation({
+    summary: 'Get contacts with advanced filtering and pagination',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Return filtered contacts with pagination',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Search term for institution, individual, email, or phone',
+  })
+  @ApiQuery({
+    name: 'organizationType',
+    required: false,
+    enum: ContactType,
+    description: 'Filter by organization type',
+  })
+  @ApiQuery({
+    name: 'position',
+    required: false,
+    enum: ContactPosition,
+    description: 'Filter by position',
+  })
+  @ApiQuery({
+    name: 'region',
+    required: false,
+    description: 'Filter by region',
+  })
+  @ApiQuery({
+    name: 'isActive',
+    required: false,
+    type: Boolean,
+    description: 'Filter by active status',
+  })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    enum: ['instituteName', 'individualName', 'organizationType', 'created_at'],
+    description: 'Sort field',
+  })
+  @ApiQuery({
+    name: 'sortOrder',
+    required: false,
+    enum: ['ASC', 'DESC'],
+    description: 'Sort order',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page (default: 50)',
+  })
   async findAll(
     @Query('search') search?: string,
     @Query('organizationType') organizationType?: ContactType,
     @Query('position') position?: ContactPosition,
     @Query('region') region?: string,
-    @Query('isActive', new ParseBoolPipe({ optional: true })) isActive?: boolean,
-    @Query('sortBy') sortBy?: 'instituteName' | 'individualName' | 'organizationType' | 'created_at',
+    @Query('isActive', new ParseBoolPipe({ optional: true }))
+    isActive?: boolean,
+    @Query('sortBy')
+    sortBy?:
+      | 'instituteName'
+      | 'individualName'
+      | 'organizationType'
+      | 'created_at',
     @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
@@ -71,7 +131,7 @@ export class ContactsController {
       sortBy,
       sortOrder,
       page,
-      limit
+      limit,
     };
     return await this.contactsService.findAll(params);
   }
@@ -91,7 +151,9 @@ export class ContactsController {
   }
 
   @Get('autocomplete')
-  @ApiOperation({ summary: 'Get autocomplete suggestions for institution names and regions' })
+  @ApiOperation({
+    summary: 'Get autocomplete suggestions for institution names and regions',
+  })
   @ApiResponse({ status: 200, description: 'Return autocomplete suggestions' })
   async getAutocomplete(@Query('q') query: string = '') {
     return await this.contactsService.getAutocompleteData(query);
@@ -99,8 +161,13 @@ export class ContactsController {
 
   @Get('by-organization/:organizationType')
   @ApiOperation({ summary: 'Get contacts by organization type' })
-  @ApiResponse({ status: 200, description: 'Return contacts of specified organization type' })
-  async findByOrganizationType(@Param('organizationType') organizationType: ContactType) {
+  @ApiResponse({
+    status: 200,
+    description: 'Return contacts of specified organization type',
+  })
+  async findByOrganizationType(
+    @Param('organizationType') organizationType: ContactType,
+  ) {
     return await this.contactsService.findByOrganizationType(organizationType);
   }
 
@@ -114,7 +181,9 @@ export class ContactsController {
   @Get('export')
   @ApiOperation({ summary: 'Export contacts (Admin only)' })
   @ApiResponse({ status: 200, description: 'Return contacts for export' })
-  async exportContacts(@Query('organizationType') organizationType?: ContactType) {
+  async exportContacts(
+    @Query('organizationType') organizationType?: ContactType,
+  ) {
     return await this.contactsService.exportContacts(organizationType);
   }
 
@@ -152,15 +221,23 @@ export class ContactsController {
   // === CONTACT SUGGESTIONS (All Users) ===
 
   @Post('suggestions')
-  @ApiOperation({ summary: 'Submit a suggestion for contact update/add/delete' })
-  @ApiResponse({ status: 201, description: 'Suggestion submitted successfully' })
+  @ApiOperation({
+    summary: 'Submit a suggestion for contact update/add/delete',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Suggestion submitted successfully',
+  })
   async createSuggestion(
     @Body() createSuggestionDto: CreateContactSuggestionDto,
-    @Request() req
+    @Request() req,
   ) {
     try {
       const userId = req.user.id;
-      return await this.contactsService.createSuggestion(createSuggestionDto, userId);
+      return await this.contactsService.createSuggestion(
+        createSuggestionDto,
+        userId,
+      );
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -175,7 +252,7 @@ export class ContactsController {
 
   @Get('suggestions/my')
   @ApiOperation({ summary: 'Get my contact suggestions' })
-  @ApiResponse({ status: 200, description: 'Return user\'s suggestions' })
+  @ApiResponse({ status: 200, description: "Return user's suggestions" })
   async getMySuggestions(@Request() req) {
     const userId = req.user.id;
     return await this.contactsService.findSuggestionsByUser(userId);
@@ -187,9 +264,13 @@ export class ContactsController {
   async reviewSuggestion(
     @Param('id') suggestionId: string,
     @Body() reviewDto: ReviewContactSuggestionDto,
-    @Request() req
+    @Request() req,
   ) {
     const reviewerId = req.user.id;
-    return await this.contactsService.reviewSuggestion(suggestionId, reviewDto, reviewerId);
+    return await this.contactsService.reviewSuggestion(
+      suggestionId,
+      reviewDto,
+      reviewerId,
+    );
   }
-} 
+}

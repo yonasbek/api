@@ -17,6 +17,6 @@ export class Reminder extends BaseEntity {
   @Column({ default: false })
   is_sent: boolean;
 
-  @ManyToOne(() => Activity, activity => activity.reminders)
+  @ManyToOne(() => Activity, (activity) => activity.reminders)
   activity: Activity;
-} 
+}

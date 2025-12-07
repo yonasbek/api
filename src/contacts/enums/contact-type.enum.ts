@@ -16,4 +16,4 @@ export enum ContactPosition {
   MEDICAL_DIRECTOR = 'MEDICAL_DIRECTOR',
   CEO = 'CEO',
   OTHER = 'OTHER',
-}   
+}

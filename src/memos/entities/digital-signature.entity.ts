@@ -5,7 +5,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('digital_signatures')
 export class DigitalSignature extends BaseEntity {
-  @ManyToOne(() => Memo, memo => memo.signatures)
+  @ManyToOne(() => Memo, (memo) => memo.signatures)
   memo: Memo;
 
   @ApiProperty({ example: 'user-123' })
@@ -23,4 +23,4 @@ export class DigitalSignature extends BaseEntity {
   @ApiProperty({ example: 'Approved with minor changes' })
   @Column('text', { nullable: true })
   comments: string;
-} 
+}

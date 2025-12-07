@@ -7,7 +7,9 @@ export class CreateCategoryDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ example: 'Articles related to programming and software development' })
+  @ApiProperty({
+    example: 'Articles related to programming and software development',
+  })
   @IsString()
   @IsOptional()
   description?: string;
@@ -16,4 +18,4 @@ export class CreateCategoryDto {
   @IsString()
   @IsOptional()
   icon?: string;
-} 
+}

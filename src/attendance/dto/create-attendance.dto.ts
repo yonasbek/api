@@ -1,4 +1,12 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber, IsEnum, ValidateNested, IsDate } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsNumber,
+  IsEnum,
+  ValidateNested,
+  IsDate,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { AttendanceStatus } from '../entities/attendance.entity';
@@ -71,4 +79,4 @@ export class CreateAttendanceDto {
   @IsString()
   @IsOptional()
   leave_reason?: string;
-} 
+}

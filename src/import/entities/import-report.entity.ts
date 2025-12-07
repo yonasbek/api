@@ -28,11 +28,15 @@ export class ImportReport extends BaseEntity {
   @Column()
   totalColumns: number;
 
-  @ApiProperty({ example: '["name", "email", "department", "salary", "hire_date"]' })
+  @ApiProperty({
+    example: '["name", "email", "department", "salary", "hire_date"]',
+  })
   @Column('text')
   headers: string;
 
-  @ApiProperty({ example: '[{"name":"John Doe","email":"john@example.com",...}]' })
+  @ApiProperty({
+    example: '[{"name":"John Doe","email":"john@example.com",...}]',
+  })
   @Column('text')
   data: string;
 

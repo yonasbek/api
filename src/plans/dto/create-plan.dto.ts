@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsNumber, IsEnum, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsEnum,
+  IsOptional,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { PlanType } from '../entities/plan.entity';
 
@@ -31,4 +37,4 @@ export class CreatePlanDto {
   @IsNumber()
   @IsOptional()
   budget_allocated?: number;
-} 
+}

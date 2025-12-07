@@ -1,6 +1,25 @@
-import { Controller, Post, UseInterceptors, UploadedFiles, Get, Param, Res, UseGuards, Body, Delete, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UseInterceptors,
+  UploadedFiles,
+  Get,
+  Param,
+  Res,
+  UseGuards,
+  Body,
+  Delete,
+  BadRequestException,
+} from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiConsumes, ApiBody, ApiBearerAuth, ApiResponse, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiConsumes,
+  ApiBody,
+  ApiBearerAuth,
+  ApiResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UploadService } from './upload.service';
@@ -29,12 +48,22 @@ export class UploadController {
         },
         module: {
           type: 'string',
-          enum: ['ACTIVITY', 'MEMO', 'KNOWLEDGE_BASE', 'PLAN', 'DOCUMENT', 'OTHER'],
+          enum: [
+            'ACTIVITY',
+            'MEMO',
+            'KNOWLEDGE_BASE',
+            'PLAN',
+            'DOCUMENT',
+            'OTHER',
+          ],
         },
       },
     },
   })
-  async uploadFiles(@UploadedFiles() files: Express.Multer.File[], @Body() body: { module: Module }): Promise<string[]> {
+  async uploadFiles(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() body: { module: Module },
+  ): Promise<string[]> {
     console.log(body);
     return await this.uploadService.uploadFiles(files, body.module);
   }
@@ -61,4 +90,4 @@ export class UploadController {
       throw new BadRequestException('Failed to list files');
     }
   }
-} 
+}
