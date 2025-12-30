@@ -52,11 +52,14 @@ export class AuthService {
     return { token, fullName: user.fullName, email: user.email, role: user.jobTitle };
   }
 
-  async login(loginDto: LoginDto): Promise<{ token: string, id: string, fullName: string, email: string, role: string, phoneNumber: string, jobTitle: string, supervisorName: string, comments: string, isActive: boolean, roleId: string, departmentId: string }> {
+  async login(loginDto: LoginDto): Promise<{ token: string, id: string, fullName: string, email: string, role: any, roleId: string, permissions: string[], phoneNumber: string, jobTitle: string, supervisorName: string, comments: string, isActive: boolean, departmentId: string }> {
     const { email, password } = loginDto;
 
-    // Find user
-    const user = await this.userRepository.findOne({ where: { email } });
+    // Find user with role and permissions
+    const user = await this.userRepository.findOne({ 
+      where: { email },
+      relations: ['role', 'role.permissions']
+    });
     if (!user) {
       throw new BadRequestException('user not found');
     }
@@ -73,18 +76,22 @@ export class AuthService {
       email: user.email,
     });
 
+    // Extract permission names
+    const permissions = user.role?.permissions?.map(p => p.name) || [];
+
     return {
       token,
       id: user.id,
       fullName: user.fullName,
       email: user.email,
-      role: user.jobTitle,
+      role: user.role ? { id: user.role.id, name: user.role.name, description: user.role.description } : null,
+      roleId: user.roleId,
+      permissions,
       phoneNumber: user.phoneNumber,
       jobTitle: user.jobTitle,
       supervisorName: user.supervisorName,
       comments: user.comments,
       isActive: user.isActive,
-      roleId: user.roleId,
       departmentId: user.departmentId,
     };
   }
