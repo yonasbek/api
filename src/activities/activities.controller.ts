@@ -22,28 +22,6 @@ export class ActivitiesController {
     return await this.activitiesService.create(createActivityDto);
   }
 
-  @Post(':id/documents')
-  @UseInterceptors(FilesInterceptor('files'))
-  @ApiOperation({ summary: 'Upload supporting documents for an activity' })
-  @ApiConsumes('multipart/form-data')
-  @ApiResponse({ status: 200, description: 'Documents uploaded successfully', type: Activity })
-  async uploadDocuments(
-    @Param('id') id: string,
-    @UploadedFiles() files: Express.Multer.File[]
-  ): Promise<Activity> {
-    return await this.activitiesService.uploadSupportingDocuments(id, files);
-  }
-
-  @Delete(':id/documents/:filename')
-  @ApiOperation({ summary: 'Remove a supporting document from an activity' })
-  @ApiResponse({ status: 200, description: 'Document removed successfully', type: Activity })
-  async removeDocument(
-    @Param('id') id: string,
-    @Param('filename') filename: string
-  ): Promise<Activity> {
-    return await this.activitiesService.removeSupportingDocument(id, filename);
-  }
-
   @Get()
   @ApiOperation({ summary: 'Get all activities' })
   @ApiResponse({ status: 200, description: 'Return all activities', type: [Activity] })
@@ -80,6 +58,28 @@ export class ActivitiesController {
     remaining: number;
   }> {
     return await this.activitiesService.getBudgetSummary(planId);
+  }
+
+  @Post(':id/documents')
+  @UseInterceptors(FilesInterceptor('files'))
+  @ApiOperation({ summary: 'Upload supporting documents for an activity' })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: 200, description: 'Documents uploaded successfully', type: Activity })
+  async uploadDocuments(
+    @Param('id') id: string,
+    @UploadedFiles() files: Express.Multer.File[]
+  ): Promise<Activity> {
+    return await this.activitiesService.uploadSupportingDocuments(id, files);
+  }
+
+  @Delete(':id/documents/:filename')
+  @ApiOperation({ summary: 'Remove a supporting document from an activity' })
+  @ApiResponse({ status: 200, description: 'Document removed successfully', type: Activity })
+  async removeDocument(
+    @Param('id') id: string,
+    @Param('filename') filename: string
+  ): Promise<Activity> {
+    return await this.activitiesService.removeSupportingDocument(id, filename);
   }
 
   @Get(':id')

@@ -355,6 +355,10 @@ export class MemosService {
       case WorkflowAction.APPROVE:
         memo.status = MemoStatus.APPROVED;
         memo.approved_at = new Date();
+        // Set signature to the approver's full name
+        if (reviewer) {
+          memo.signature = reviewer.fullName;
+        }
         break;
       case WorkflowAction.RETURN_TO_CREATOR:
         memo.status = MemoStatus.RETURNED_TO_CREATOR;

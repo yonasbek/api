@@ -44,8 +44,8 @@ export class Activity extends BaseEntity {
   strategic_objective: string;
 
   @ApiProperty({ example: 'IT Department' })
-  @Column()
-  responsible_department: string;
+  @Column({ nullable: true })
+  responsible_department?: string;
 
   @ApiProperty({ example: 'John Doe' })
   @Column()

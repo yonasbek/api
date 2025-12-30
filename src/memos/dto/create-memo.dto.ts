@@ -55,10 +55,10 @@ export class CreateMemoDto {
   @IsOptional()
   priority_level?: PriorityLevel;
 
-  @ApiProperty({ example: 'John Doe' })
+  @ApiProperty({ example: 'John Doe', required: false })
   @IsString()
-  @IsNotEmpty()
-  signature: string;
+  @IsOptional()
+  signature?: string;
 
   // @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
   // @IsUUID()

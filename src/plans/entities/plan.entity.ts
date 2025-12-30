@@ -41,6 +41,10 @@ export class Plan extends BaseEntity {
   @Column({default: 0})
   budget_allocated: number;
 
+  @ApiProperty({ example: 'ETB', description: 'Currency code (e.g., ETB, USD, EUR)' })
+  @Column({default: 'ETB', nullable: true})
+  currency?: string;
+
   @ApiProperty({ example: '10000' })
   @Column({default: 0})
   budget_spent: number;

@@ -26,10 +26,10 @@ export class DocumentGenerationService {
     return {
       id: memo.id,
       title: memo.title,
-      content: memo.body,
-      date: memo.date_of_issue,
-      signature: memo.signature,
-      department: memo.department,
+      content: memo.body ?? '',
+      date: memo.date_of_issue ?? new Date(),
+      signature: memo.signature ?? '',
+      department: memo.department ?? '',
       memoNumber: memoNumber
     };
   }

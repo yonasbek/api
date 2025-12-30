@@ -1,24 +1,71 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UploadService } from '../upload/upload.service';
+import { Module } from '../upload/upload.entity';
 
 @ApiTags('Meeting Rooms')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('rooms')
 export class RoomsController {
-  constructor(private readonly roomsService: RoomsService) {}
+  constructor(
+    private readonly roomsService: RoomsService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   // Room endpoints
   @Post()
+  @UseInterceptors(FilesInterceptor('images'))
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Create a new room' })
   @ApiResponse({ status: 201, description: 'Room created successfully' })
-  create(@Body() createRoomDto: CreateRoomDto) {
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        capacity: { type: 'number' },
+        floor: { type: 'string' },
+        status: { type: 'string', enum: ['available', 'occupied', 'maintenance'] },
+        description: { type: 'string' },
+        facilities: { type: 'string' },
+        images: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
+  async create(
+    @Body() body: any,
+    @UploadedFiles() files?: Express.Multer.File[],
+  ) {
+    // Parse FormData fields
+    const createRoomDto: CreateRoomDto = {
+      name: body.name,
+      capacity: body.capacity ? Number(body.capacity) : 0,
+      floor: body.floor,
+      status: body.status,
+      description: body.description,
+      facilities: body.facilities ? (typeof body.facilities === 'string' ? JSON.parse(body.facilities) : body.facilities) : [],
+      images: [],
+    };
+
+    // Upload images if provided
+    if (files && files.length > 0) {
+      const uploadedFiles = await this.uploadService.uploadFiles(files, Module.ROOM, false);
+      createRoomDto.images = uploadedFiles;
+    }
     return this.roomsService.createRoom(createRoomDto);
   }
 
@@ -48,9 +95,53 @@ export class RoomsController {
   }
 
   @Patch(':id')
+  @UseInterceptors(FilesInterceptor('images'))
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Update a room' })
   @ApiResponse({ status: 200, description: 'Room updated successfully' })
-  update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDto) {
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        capacity: { type: 'number' },
+        floor: { type: 'string' },
+        status: { type: 'string', enum: ['available', 'occupied', 'maintenance'] },
+        description: { type: 'string' },
+        facilities: { type: 'string' },
+        images: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
+  async update(
+    @Param('id') id: string,
+    @Body() body: any,
+    @UploadedFiles() files?: Express.Multer.File[],
+  ) {
+    // Parse FormData fields
+    const updateRoomDto: UpdateRoomDto = {
+      name: body.name,
+      capacity: body.capacity ? Number(body.capacity) : undefined,
+      floor: body.floor,
+      status: body.status,
+      description: body.description,
+      facilities: body.facilities ? (typeof body.facilities === 'string' ? JSON.parse(body.facilities) : body.facilities) : undefined,
+      images: [],
+    };
+
+    // Upload new images if provided
+    if (files && files.length > 0) {
+      const uploadedFiles = await this.uploadService.uploadFiles(files, Module.ROOM, false);
+      // Merge with existing images if any
+      const existingRoom = await this.roomsService.findOneRoom(id);
+      updateRoomDto.images = [...(existingRoom.images || []), ...uploadedFiles];
+    }
     return this.roomsService.updateRoom(id, updateRoomDto);
   }
 

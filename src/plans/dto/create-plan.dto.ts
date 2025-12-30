@@ -32,6 +32,11 @@ export class CreatePlanDto {
   @IsOptional()
   budget_allocated?: number;
 
+  @ApiProperty({ example: 'ETB', description: 'Currency code (e.g., ETB, USD, EUR)' })
+  @IsString()
+  @IsOptional()
+  currency?: string;
+
   @ApiProperty({ example: ['internal', 'donor'], description: 'Budget sources: internal, donor, government, partner' })
   @IsArray()
   @IsString({ each: true })

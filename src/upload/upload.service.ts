@@ -30,7 +30,10 @@ export class UploadService {
       throw new BadRequestException('No files provided');
     }
 
-    console.log(requiresApproval == true, 'requiresApproval');
+    // Ensure requiresApproval is always a boolean
+    const requiresApprovalBool = requiresApproval == true;
+    
+    console.log(requiresApprovalBool, 'requiresApproval');
 
 
     const savedFiles: string[] = [];
@@ -51,8 +54,8 @@ export class UploadService {
         upload.document_size = file.size;
         upload.upload_date = new Date();
         upload.module = module;
-        upload.requires_approval = requiresApproval;
-        upload.status = requiresApproval ? 'pending' : 'published';
+        upload.requires_approval = requiresApprovalBool;
+        upload.status = requiresApprovalBool ? 'pending' : 'published';
         await this.uploadRepository.save(upload);
         savedFiles.push(fileName);
       } catch (error) {
@@ -77,7 +80,7 @@ export class UploadService {
   }
 
   async getFilePath(fileName: string): Promise<string> {
-    const filePath = path.join('http://localhost:3000/',this.uploadDir, fileName);
+    const filePath = path.join(process.cwd(), this.uploadDir, fileName);
     try {
       await fs.access(filePath);
       return filePath;

@@ -54,9 +54,14 @@ export class Room extends BaseEntity {
   @Column('text', { nullable: true })
   description: string;
 
-  @ApiProperty({ example: 'https://example.com/room.jpg' })
-  @Column('text', { nullable: true })
-  image: string;
+  @ApiProperty({ 
+    type: 'array',
+    items: { type: 'string' },
+    example: ['room1.jpg', 'room2.jpg'],
+    description: 'Array of image file names'
+  })
+  @Column('text', { array: true, nullable: true, default: [] })
+  images: string[];
 
   @OneToMany(() => Booking, booking => booking.room)
   bookings: Booking[];

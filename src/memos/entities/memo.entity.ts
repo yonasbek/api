@@ -63,9 +63,9 @@ export class Memo extends BaseEntity {
   })
   priority_level: PriorityLevel;
 
-  @ApiProperty({ example: 'John Doe' })
-  @Column()
-  signature: string;
+  @ApiProperty({ example: 'John Doe', nullable: true })
+  @Column({ nullable: true })
+  signature?: string;
 
   @ApiProperty({ enum: MemoStatus, example: MemoStatus.DRAFT })
   @Column({

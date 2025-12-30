@@ -319,10 +319,10 @@ export class ActivitiesService {
       text: activity.title,
       start_date: activity.start_date,
       end_date: activity.end_date,
+      department: activity.responsible_department ?? '',
       progress: activity.progress / 100, // Convert percentage to decimal
       type: 'task',
       plan_type: activity.plan_type,
-      department: activity.responsible_department,
       assigned_to: activity.assigned_person,
       status: activity.status,
       budget: activity.budget_allocated,

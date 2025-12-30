@@ -185,8 +185,26 @@ export class PlansService {
 
   async update(id: string, updatePlanDto: UpdatePlanDto): Promise<Plan> {
     const plan = await this.findOne(id);
-    Object.assign(plan, updatePlanDto);
-    return await this.planRepository.save(plan);
+    if (!plan) {
+      throw new NotFoundException(`Plan with ID ${id} not found`);
+    }
+    
+    // Update only the fields that are provided
+    if (updatePlanDto.title !== undefined) plan.title = updatePlanDto.title;
+    if (updatePlanDto.fiscal_year !== undefined) plan.fiscal_year = updatePlanDto.fiscal_year;
+    if (updatePlanDto.status !== undefined) plan.status = updatePlanDto.status;
+    if (updatePlanDto.budget_allocated !== undefined) plan.budget_allocated = updatePlanDto.budget_allocated;
+    if (updatePlanDto.currency !== undefined) plan.currency = updatePlanDto.currency;
+    if (updatePlanDto.budget_source !== undefined) plan.budget_source = updatePlanDto.budget_source;
+    if (updatePlanDto.owner !== undefined) plan.owner = updatePlanDto.owner;
+    if (updatePlanDto.plan_type !== undefined) plan.plan_type = updatePlanDto.plan_type;
+    
+    const updatedPlan = await this.planRepository.save(plan);
+    
+    // Recalculate progress after update
+    await this.calculatePlanProgress(updatedPlan);
+    
+    return updatedPlan;
   }
 
   async remove(id: string): Promise<void> {

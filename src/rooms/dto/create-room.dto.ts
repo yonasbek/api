@@ -29,6 +29,7 @@ export class CreateRoomDto {
   @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
+  @Type(() => Number)
   capacity: number;
 
   @ApiProperty()
@@ -53,8 +54,14 @@ export class CreateRoomDto {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ required: false })
-  @IsString()
+  @ApiProperty({ 
+    type: 'array',
+    items: { type: 'string' },
+    required: false,
+    description: 'Array of image file names'
+  })
+  @IsArray()
+  @IsString({ each: true })
   @IsOptional()
-  image?: string;
+  images?: string[];
 } 

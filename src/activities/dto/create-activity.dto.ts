@@ -26,8 +26,8 @@ export class CreateActivityDto {
 
   @ApiProperty({ example: 'IT Department' })
   @IsString()
-  @IsNotEmpty()
-  responsible_department: string;
+  @IsOptional()
+  responsible_department?: string;
 
   @ApiProperty({ example: 'John Doe' })
   @IsString()
